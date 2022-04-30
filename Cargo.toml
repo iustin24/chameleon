@@ -1,0 +1,22 @@
+[package]
+name = "content"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wappalyzer = { git = "https://github.com/iustin24/wappalyzer?" }
+config = "0.13.1"
+reqwest = { version = "0.10", default-features = false, features=["rustls-tls"]}
+tokio = { version = "0.2", features = ["macros"] }
+futures = "0.3"
+regex = "1"
+lazy_static = "1.4.0"
+csv = "1.1.6"
+chrono = { version = "0.4.19", features = ["serde"]}
+url = "2.2.2"
+serde = "1.0.133"
+rand = "0.8.4"
+indicatif = "0.16.2"
+colored = "2.0.0"
