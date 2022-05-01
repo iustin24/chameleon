@@ -3,7 +3,7 @@ use std::collections::{HashSet};
 use std::ops::Not;
 use std::time::{Duration, Instant};
 use indicatif::ProgressBar;
-use url::Url;
+use url::Url::{Parse};
 use futures::{ stream, StreamExt};
 use reqwest::{Client as http};
 use colored::Colorize;
@@ -32,7 +32,7 @@ pub(crate) async fn http(paths: HashSet<String>, url: String, concurrency: u16) 
         .timeout(Duration::from_secs(5))
         .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
     let client = client_builder.build().unwrap();
-
+    let path = Url::parse(&url).unwrap();
     stream::iter(paths)
         .map(|path| async {
             bar.inc(1);
