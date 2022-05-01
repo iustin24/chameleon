@@ -1,40 +1,71 @@
+extern crate dirs;
+use std::collections::{HashMap, HashSet};
 use std::fs::read_to_string;
 use std::io::{BufRead, stdin};
 use clap::Parser;
 use anyhow::Result;
+use config::{Config};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 pub struct Args {
     #[clap(
-    short = 'd',
-    long = "domains",
-    help = "The file containing domains you want to generate permutations from. If this is not specified, domains are read from stdin."
-    )]
-    pub(crate) domain_file_path: Option<String>,
-
-    #[clap(
     short = 'w',
     long = "wordlist",
-    help = "The supplementary wordlist file to include."
+    help = "The supplementary wordlist file to include.",
     )]
     pub(crate) wordlist: Option<String>,
 
     #[clap(
-    short = 'l',
-    long = "len",
-    help = "The minimum length for a word to be considered important. If not specified, all words are accepted."
+    short = 'c',
+    long = "config",
+    help = "Config file to use",
+    default_value = "~/.config/content/config.toml"
     )]
-    pub(crate) min_word_len: Option<usize>,
+    pub(crate) config: String,
+
+    #[clap(
+    short = 'u',
+    long = "url",
+    help = "url to scan"
+    )]
+    pub(crate) url: String,
+
+    #[clap(
+    short = 't',
+    long = "concurrency",
+    help = "Number of concurrent threads ( default: 200 )",
+    default_value = "200"
+    )]
+    pub(crate) concurrency: u16,
 }
 
 impl Args {
     pub(crate) fn get_wordlist_str(&self) -> Result<String> {
         let output = match self.wordlist {
             Some(ref path) => read_to_string(path)?,
-            None => String::new()
+            None => {
+                read_to_string(self.get_wordlist_path(&self.get_config(),"main_wordlist").unwrap())?
+            }
         };
-
         Ok(output)
+    }
+    pub(crate) fn get_wordlist_path(&self, settings: &HashMap<String, String>, wordlist: &str) -> Option<String> {
+        match settings.get(&wordlist
+                .replace(" ", "_")
+                .replace(".", "_")
+            ) {
+            Some(t) => Some(t.replace("~", dirs::home_dir().unwrap().to_str().unwrap())),
+            None => None
+        }
+
+    }
+    pub(crate) fn get_config(&self) -> HashMap<String, String> {
+        Config::builder()
+            .add_source(config::File::with_name(&self.config.as_str().replace("~", dirs::home_dir().unwrap().to_str().unwrap())))
+            .build()
+            .unwrap()
+            .try_deserialize::<HashMap<String, String>>()
+            .unwrap()
     }
 }
