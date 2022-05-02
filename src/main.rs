@@ -2,23 +2,16 @@ mod args;
 mod http_utils;
 mod utils;
 
-use config::Config;
 extern crate futures;
 extern crate dirs;
-use indicatif::{ProgressBar};
-use futures::{ stream, StreamExt};
-use reqwest::{Client as http};
-use std::time::Duration;
-use std::time::Instant;
-use std::collections::{HashMap, HashSet};
-use std::env::home_dir;
 use std::fs::read_to_string;
-use std::ops::Not;
 use crate::args::Args;
 use clap::Parser;
 use colored::Colorize;
+
 #[tokio::main]
 async fn main() {
+
     let args: Args = Args::parse();
 
     let mut wordlist = args.get_wordlist_str()
@@ -41,6 +34,6 @@ async fn main() {
         }
     }
 
-    http_utils::http(utils::sort_wordlist(&wordlist), args.url, args.concurrency).await;
+    http_utils::http(utils::sort_wordlist(&wordlist), args.url).await;
 
 }

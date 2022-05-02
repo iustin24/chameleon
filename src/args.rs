@@ -1,7 +1,6 @@
 extern crate dirs;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 use std::fs::read_to_string;
-use std::io::{BufRead, stdin};
 use clap::Parser;
 use anyhow::Result;
 use config::{Config};
@@ -38,6 +37,21 @@ pub struct Args {
     default_value = "200"
     )]
     pub(crate) concurrency: u16,
+
+    #[clap(
+    short = 'S',
+    long = "fs",
+    help = "Filter HTTP response size. Comma separated list of sizes and ranges",
+    )]
+    pub(crate) filtersize: Option<String>,
+
+    #[clap(
+    short = 'f',
+    long = "fc",
+    help = "Filter HTTP status codes from response - Comma separated list",
+    default_value = "404"
+    )]
+    pub(crate) filtercode: String,
 }
 
 impl Args {
