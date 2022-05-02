@@ -159,6 +159,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chameleon"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "colored",
+ "config",
+ "dirs",
+ "futures 0.3.21",
+ "indicatif",
+ "rand 0.8.5",
+ "reqwest",
+ "serde",
+ "tokio",
+ "url",
+ "wappalyzer",
+]
+
+[[package]]
 name = "clap"
 version = "3.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -254,25 +273,6 @@ name = "const_fn"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbdcdcb6d86f71c5e97409ad45898af11cbc995b4ee8112d59095a28d376c935"
-
-[[package]]
-name = "content"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "colored",
- "config",
- "dirs",
- "futures 0.3.21",
- "indicatif",
- "rand 0.8.5",
- "reqwest",
- "serde",
- "tokio",
- "url",
- "wappalyzer",
-]
 
 [[package]]
 name = "cookie"
