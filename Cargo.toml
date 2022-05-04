@@ -12,7 +12,6 @@ reqwest = { version = "0.10", default-features = false, features=["rustls-tls"]}
 tokio = { version = "0.2", features = ["macros"] }
 futures = "0.3"
 url = "2.2.2"
-serde = "1.0.133"
 rand = "0.8.4"
 indicatif = "0.16.2"
 colored = "2.0.0"

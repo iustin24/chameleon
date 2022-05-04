@@ -11,9 +11,16 @@ pub struct Args {
     #[clap(
     short = 'w',
     long = "wordlist",
-    help = "The supplementary wordlist file to include.",
+    help = "Main wordlist to use for bruteforcing",
     )]
     pub(crate) wordlist: Option<String>,
+
+    #[clap(
+    short = 'W',
+    long = "small wordlist",
+    help = "Wordlist used to generate files by adding extensions ( FUZZ.%ext )",
+    )]
+    pub(crate) small_wordlist: Option<String>,
 
     #[clap(
     short = 'c',
@@ -55,25 +62,40 @@ pub struct Args {
 }
 
 impl Args {
-    pub(crate) fn get_wordlist_str(&self) -> Result<String> {
+    pub(crate) fn get_main_wordlist_str(&self, settings: &HashMap<String, String>) -> Result<String> {
         let output = match self.wordlist {
             Some(ref path) => read_to_string(path)?,
             None => {
-                read_to_string(self.get_wordlist_path(&self.get_config(),"main_wordlist").unwrap())?
+                read_to_string(self.get_wordlist_path(settings, "main_wordlist").unwrap())?
             }
         };
         Ok(output)
     }
-    pub(crate) fn get_wordlist_path(&self, settings: &HashMap<String, String>, wordlist: &str) -> Option<String> {
-        match settings.get(&wordlist
+
+    pub(crate) fn get_small_wordlist_str(&self, settings: &HashMap<String, String>) -> Result<String> {
+        let output = match self.small_wordlist {
+            Some(ref path) => read_to_string(path)?,
+            None => {
+                read_to_string(self.get_wordlist_path(settings, "small_wordlist").unwrap())?
+            }
+        };
+        Ok(output)
+    }
+
+    pub(crate) fn get_wordlist_path<'a>(&self, settings: &'a HashMap<String, String>, wordlist: &str) -> Option<&'a String> {
+        settings.get(&wordlist
                 .replace(" ", "_")
                 .replace(".", "_")
-            ) {
-            Some(t) => Some(t.replace("~", dirs::home_dir().unwrap().to_str().unwrap())),
-            None => None
-        }
-
+            )
     }
+
+    pub(crate) fn get_extensions<'a>(&self, settings: &'a HashMap<String, String>, wordlist: &str) -> Option<&'a String> {
+        settings.get(&( wordlist
+            .replace(" ", "_")
+            .replace(".", "_") + "_ext")
+        )
+    }
+
     pub(crate) fn get_config(&self) -> HashMap<String, String> {
         Config::builder()
             .add_source(config::File::with_name(&self.config.as_str().replace("~", dirs::home_dir().unwrap().to_str().unwrap())))
@@ -81,5 +103,10 @@ impl Args {
             .unwrap()
             .try_deserialize::<HashMap<String, String>>()
             .unwrap()
+            .into_iter()
+            .map(|(key, value)|
+                (key, value.replace("~", dirs::home_dir().unwrap().to_str().unwrap()))
+            )
+            .collect()
     }
 }

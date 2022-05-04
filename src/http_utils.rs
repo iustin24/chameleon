@@ -9,6 +9,7 @@ use futures::{ stream, StreamExt};
 use reqwest::{Client as http};
 use colored::Colorize;
 use clap::Parser;
+use std::collections::hash_map::RandomState;
 
 #[derive(Debug)]
 struct Data {
@@ -69,6 +70,28 @@ pub(crate) async fn http(paths: HashSet<String>, url: String) {
             Some(0)
         }).collect::<Vec<i32>>().await;
     println!("Total time elapsed: {}ms", now.elapsed().as_millis());
+}
+
+pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: Vec<&str>) {
+    eprintln!("Generating wordlist using ./wordlists/raft-small-words.txt and extensions: {}", extensions.join(","));
+    for e in extensions {
+        wordlist.push_str(words.replace("\n", format!(".{}\n", e).as_str()).as_str());
+    }
+}
+
+pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
+    match iis {
+        true => {
+            wordlist.lines()
+                .map(|a|a.to_lowercase())
+                .collect::<HashSet<String>>()
+        },
+        false =>  {
+            wordlist.lines()
+                .map(|a|a.to_owned())
+                .collect::<HashSet<String>>()
+        }
+    }
 }
 
 fn human_size(mut size: i64) -> String {

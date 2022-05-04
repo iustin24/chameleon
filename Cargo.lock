@@ -171,7 +171,6 @@ dependencies = [
  "indicatif",
  "rand 0.8.5",
  "reqwest",
- "serde",
  "tokio",
  "url",
  "wappalyzer",
