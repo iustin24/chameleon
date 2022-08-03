@@ -1,5 +1,0 @@
-.php
-cgi-bin
-images
-admin
-includes

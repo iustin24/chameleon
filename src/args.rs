@@ -1,9 +1,11 @@
 extern crate dirs;
 use std::collections::{HashMap};
 use std::fs::read_to_string;
+use std::time::Duration;
 use clap::Parser;
 use anyhow::Result;
 use config::{Config};
+use reqwest::{Client as http, Client};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
@@ -23,10 +25,18 @@ pub struct Args {
     pub(crate) small_wordlist: Option<String>,
 
     #[clap(
+    short = 'd',
+    long = "download-wordlists",
+    help = "Download custom Wordlists",
+    takes_value = false,
+    )]
+    pub(crate) download: Option<String>,
+
+    #[clap(
     short = 'c',
     long = "config",
     help = "Config file to use",
-    default_value = "~/.config/content/config.toml"
+    default_value = "~/.config/chameleon/config.toml"
     )]
     pub(crate) config: String,
 
@@ -38,12 +48,26 @@ pub struct Args {
     pub(crate) url: String,
 
     #[clap(
+    short = 'H',
+    long = "HTTP Header",
+    help = "HTTP header. Multiple -H flags are accepted."
+    )]
+    pub(crate) header: Option<String>,
+
+    #[clap(
     short = 't',
     long = "concurrency",
     help = "Number of concurrent threads ( default: 200 )",
     default_value = "200"
     )]
     pub(crate) concurrency: u16,
+
+    #[clap(
+    short = 'T',
+    long = "tech url",
+    help = "URL which will be scanned for technologies. By default, this is the same as '-u', however it can be changed using '-T'"
+    )]
+    pub(crate) tech_url: Option<String>,
 
     #[clap(
     short = 'S',
@@ -70,6 +94,14 @@ impl Args {
             }
         };
         Ok(output)
+    }
+    pub(crate) fn build_client(&self) -> Client {
+        let client_builder = http::builder().connect_timeout(Duration::from_secs(5))
+            .danger_accept_invalid_certs(true)
+            .redirect(reqwest::redirect::Policy::none())
+            .timeout(Duration::from_secs(5))
+            .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+        client_builder.build().unwrap()
     }
 
     pub(crate) fn get_small_wordlist_str(&self, settings: &HashMap<String, String>) -> Result<String> {
