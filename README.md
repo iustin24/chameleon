@@ -1,3 +1,5 @@
 # Chameleon 
 
-Chameleon is a fast directory bruteforcer written in rust. Chameleon tries to achieve better content discovery by using wappalyzer's set of technology fingerprints and generating custom wordlists specific to detected technologies.
+Chameleon provides better content discovery by using wappalyzer's set of technology fingerprints and custom generated wordlists tailored to the detected technologies.
+
+The tool is highly customizable and allows users to add in their own custom wordlits, extensions or fingerprints.
