@@ -23,8 +23,8 @@
 ).*"""
 .]+
 .well-known/change-password
-/bis.uga.edu/
-/www.english.uga.edu/~nhilton/ee/home.html
+bis.uga.edu/
+www.english.uga.edu/~nhilton/ee/home.html
 1
 10
 11
