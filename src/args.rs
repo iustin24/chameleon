@@ -24,6 +24,7 @@ pub struct Args {
     )]
     pub(crate) small_wordlist: Option<String>,
 
+    /*
     #[clap(
     short = 'd',
     long = "download-wordlists",
@@ -31,6 +32,7 @@ pub struct Args {
     takes_value = false,
     )]
     pub(crate) download: Option<String>,
+    */
 
     #[clap(
     short = 'c',
