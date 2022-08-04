@@ -85,6 +85,14 @@ pub struct Args {
     default_value = "404"
     )]
     pub(crate) filtercode: String,
+
+    #[clap(
+    short = 'U',
+    long = "user-agent",
+    help = "Change the value for the user-agent header",
+    default_value = "Chameleon / https://github.com/iustin24/chameleon"
+    )]
+    pub(crate) useragent: String,
 }
 
 impl Args {
@@ -102,7 +110,7 @@ impl Args {
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
             .timeout(Duration::from_secs(5))
-            .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+            .user_agent(&self.useragent);
         client_builder.build().unwrap()
     }
 
