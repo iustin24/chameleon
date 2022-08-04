@@ -108,6 +108,19 @@ You can add new technology wordlists by taking the name of a technology from `ap
 ...
 ```
 
+### Adding new extension fingerprints.
+
+Chameleon generates wordlists using characteristic extensions matching the detected technology. You can add / modify the extensions in the config file like so:
+
+```
+# Technology specific Extensions
+
+Microsoft_ASP_NET_ext="aspx,ashx,asmx,asp"
+Java_ext="jsp"
+CFML_ext="cfm"
+Python_ext="py"
+PHP_ext="php"
+```
 
 ## To-do
 
