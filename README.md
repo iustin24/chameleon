@@ -102,7 +102,7 @@ https://github.com/iustin24/wappalyzer/blob/master/apps.json
 You can add new technology wordlists by taking the name of a technology from `apps.json` and adding it to the config file like so:
 
 <p align="center">
-  <img width="250" src="_img/bitrix.png">
+  <img width="600" src="_img/bitrix.png">
 </p>
 
 ```
