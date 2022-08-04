@@ -30,7 +30,7 @@ If you do not have (headless) chrome installed already, you will need to install
 ```
 
 <p align="center">
-  <img width="600" src="_img/hackerone.png">
+  <img width="1200" src="_img/hackerone.png">
 </p>
 
 ### Options
