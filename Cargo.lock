@@ -878,7 +878,7 @@ dependencies = [
 [[package]]
 name = "headless_chrome"
 version = "0.9.0"
-source = "git+https://github.com/atroche/rust-headless-chrome#193be16f4c26e31408bee385a26b9d070d9973ca"
+source = "git+https://github.com/atroche/rust-headless-chrome?rev=5f2311ad82#5f2311ad82cbc8627d476f56a07f6e2883c1c082"
 dependencies = [
  "anyhow",
  "auto_generate_cdp",
@@ -2892,7 +2892,7 @@ dependencies = [
 [[package]]
 name = "wappalyzer"
 version = "0.1.0"
-source = "git+https://github.com/iustin24/wappalyzer?#7b27e39c4af34eedc8817bfe3b5de9b9790eadb9"
+source = "git+https://github.com/iustin24/wappalyzer?#0c9708d94ab757a77842782eed6563311a18b229"
 dependencies = [
  "futures 0.3.21",
  "headless_chrome",

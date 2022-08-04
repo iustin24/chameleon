@@ -87,6 +87,7 @@ pub(crate) fn download_wordlists() {
 pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
     match iis {
         true => {
+            eprintln!("Detected IIS - Using a lowercase only wordlist."\n);
             wordlist.lines()
                 .map(|a|a.to_lowercase())
                 .collect::<HashSet<String>>()
