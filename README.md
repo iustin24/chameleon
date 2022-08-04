@@ -112,4 +112,5 @@ You can add new technology wordlists by taking the name of a technology from `ap
 ## To-do
 
 ~~Update the wappalyzer crate to also support the "implies" feature for better technology detection.~~
+
 Add option to add custom headers.
