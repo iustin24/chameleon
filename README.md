@@ -95,10 +95,7 @@ Go="~/.config/chameleon/wordlists/GO.txt"
 
 ### Adding new technology wordlists
 
-Chameleon uses fingerprints from the following file:
-
-https://github.com/iustin24/wappalyzer/blob/master/apps.json
-
+Chameleon uses fingerprints from https://github.com/iustin24/wappalyzer/blob/master/apps.json. 
 You can add new technology wordlists by taking the name of a technology from `apps.json` and adding it to the config file like so:
 
 <p align="center">
