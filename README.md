@@ -19,13 +19,8 @@ Installing the crate will create the directory `~/.config/chameleon/` and downlo
 
 ### Step 3:
 
-Since the tool uses a headless browser to render the html, you will need headless chrome installed.
-
-Ubuntu:
-
-```
-> sudo apt-get install chromium-browser
-```
+If you do not have (headless) chrome installed already, you will need to install (headless) chrome otherwise you will get the following error:
+`Could not auto detect a chrome executable`
 
 ## Example Usage:
 
@@ -33,6 +28,10 @@ Ubuntu:
 ```
 > chameleon --url https://example.com/ -w /path/to/wordlist -f 404
 ```
+
+<p align="center">
+  <img width="600" src="_img/hackerone.png">
+</p>
 
 ### Options
 
@@ -95,14 +94,11 @@ Go="~/.config/chameleon/wordlists/GO.txt"
 
 ### Adding new technology wordlists
 
-Chameleon uses fingerprints from the following file:
-
-https://github.com/iustin24/wappalyzer/blob/master/apps.json
-
+Chameleon uses fingerprints from https://github.com/iustin24/wappalyzer/blob/master/apps.json. 
 You can add new technology wordlists by taking the name of a technology from `apps.json` and adding it to the config file like so:
 
 <p align="center">
-  <img width="250" src="_img/bitrix.png">
+  <img width="600" src="_img/bitrix.png">
 </p>
 
 ```
