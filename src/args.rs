@@ -48,14 +48,14 @@ pub struct Args {
     help = "url to scan"
     )]
     pub(crate) url: String,
-
+/*
     #[clap(
     short = 'H',
     long = "HTTP Header",
     help = "HTTP header. Multiple -H flags are accepted."
     )]
     pub(crate) header: Option<String>,
-
+*/
     #[clap(
     short = 't',
     long = "concurrency",
