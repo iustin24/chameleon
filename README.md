@@ -13,7 +13,7 @@ Visit https://rustup.rs/ and follow the instructions to get started with rust an
 ### Step 2: 
 
 ```
-> cargo install https://github.com/iustin24/chameleon
+> cargo install --git https://github.com/iustin24/chameleon
 ```
 Installing the crate will create the directory `~/.config/chameleon/` and download the config file and custom wordlists.
 
@@ -30,7 +30,7 @@ If you do not have (headless) chrome installed already, you will need to install
 ```
 
 <p align="center">
-  <img width="600" src="_img/hackerone.png">
+  <img width="1200" src="_img/hackerone.png">
 </p>
 
 ### Options
@@ -108,7 +108,22 @@ You can add new technology wordlists by taking the name of a technology from `ap
 ...
 ```
 
+### Adding new extension fingerprints.
+
+Chameleon generates wordlists using characteristic extensions matching the detected technology. You can add / modify the extensions in the config file like so:
+
+```
+# Technology specific Extensions
+
+Microsoft_ASP_NET_ext="aspx,ashx,asmx,asp"
+Java_ext="jsp"
+CFML_ext="cfm"
+Python_ext="py"
+PHP_ext="php"
+```
 
 ## To-do
 
-Update the wappalyzer crate to also support the "implies" feature for better technology detection.
+~~Update the wappalyzer crate to also support the "implies" feature for better technology detection.~~
+
+Add option to add custom headers.

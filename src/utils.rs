@@ -76,14 +76,6 @@ pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: 
     }
 }
 
-/*
-pub(crate) fn download_wordlists() {
-    fn main() {
-        Command::new("sh").arg("-c").arg("mkdir -p ~/.config/content/; cd ~/.config/content/; git clone https://github.com/iustin24/chameleon-wordlists/").status().unwrap();
-    }
-}
-*/
-
 pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
     match iis {
         true => {
