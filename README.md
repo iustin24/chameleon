@@ -59,6 +59,9 @@ OPTIONS:
     -u, --url <URL>
             url to scan
 
+    -U, --user-agent <USERAGENT>
+            Change the value for the user-agent header [default: "Chameleon / https://github.com/iustin24/chameleon"]
+
     -V, --version
             Print version information
 
