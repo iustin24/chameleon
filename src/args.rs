@@ -19,20 +19,18 @@ pub struct Args {
 
     #[clap(
     short = 'W',
-    long = "small wordlist",
+    long = "small-wordlist",
     help = "Wordlist used to generate files by adding extensions ( FUZZ.%ext )",
     )]
     pub(crate) small_wordlist: Option<String>,
 
-    /*
     #[clap(
-    short = 'd',
-    long = "download-wordlists",
-    help = "Download custom Wordlists",
+    short = 'a',
+    long = "tech-detect",
+    help = "Automatically detect technologies with wappalyzer and adapt",
     takes_value = false,
     )]
-    pub(crate) download: Option<String>,
-    */
+    pub(crate) tech_detect: bool,
 
     #[clap(
     short = 'c',
@@ -70,6 +68,13 @@ pub struct Args {
     help = "URL which will be scanned for technologies. By default, this is the same as '-u', however it can be changed using '-T'"
     )]
     pub(crate) tech_url: Option<String>,
+
+    #[clap(
+    short = 'i',
+    long = "include tech",
+    help = "Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )"
+    )]
+    pub(crate) techs: Option<String>,
 
     #[clap(
     short = 'S',

@@ -19,7 +19,7 @@ Installing the crate will create the directory `~/.config/chameleon/` and downlo
 
 ### Step 3:
 
-If you do not have (headless) chrome installed already, you will need to install (headless) chrome otherwise you will get the following error:
+In order to use the technology auto-detect feature, you will need to install (headless) chrome otherwise you will get the following error:
 `Could not auto detect a chrome executable`
 
 ## Example Usage:
@@ -45,6 +45,9 @@ OPTIONS:
 
     -h, --help
             Print help information
+            
+    -i, --include tech <TECHS>
+            Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )
 
     -S, --fs <FILTERSIZE>
             Filter HTTP response size. Comma separated list of sizes and ranges
@@ -130,3 +133,5 @@ PHP_ext="php"
 ~~Update the wappalyzer crate to also support the "implies" feature for better technology detection.~~
 
 Add option to add custom headers.
+
+Add auto calibration for filtering

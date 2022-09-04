@@ -24,8 +24,36 @@ async fn main() {
     };
 
     // Detect Technologies running on the host
-    let tech = utils::tech_detect(tech_url.as_str()).await.result.unwrap();
+    let mut tech: Vec<Tech> = vec![];
+    if args.tech_detect {
+        match utils::tech_detect(tech_url.as_str()).await.result {
+            Ok(t) => tech = t,
+            Err(e) => eprintln!(
+                "Failed to detect technologies . Got following error: {} ",
+                e
+            ),
+        };
+    }
+
     // Import wordlists specific to detected technologies
+    if let Some(techs) = &args.techs {
+        techs
+            .split(",")
+            .filter_map(|t| {
+                for tt in &tech {
+                    if tt.name.eq(t) {
+                        return None;
+                    }
+                }
+                tech.push(Tech {
+                    name: String::from(t),
+                    category: String::from(""),
+                });
+                Some(0)
+            })
+            .collect::<Vec<i8>>();
+    }
+
     for fg in &tech {
         match args.get_wordlist_path(&settings, &fg.name) {
             Some(wordlist_path) => {

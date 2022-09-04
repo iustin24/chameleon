@@ -7,6 +7,7 @@ use url::Url;
 use futures::{ stream, StreamExt};
 use colored::Colorize;
 use clap::Parser;
+use rand::{distributions::Alphanumeric, Rng};
 //use std::process::Command;
 
 #[derive(Debug)]
@@ -29,7 +30,8 @@ pub(crate) async fn http(paths: HashSet<String>, url: String) {
     let bar = ProgressBar::new(paths.len() as u64);
     eprintln!("Probing {:?} urls", bar.length());
     let client = args.build_client();
-    let path_prefix = Url::parse(&url).unwrap();
+    let parse = Url::parse(&url).unwrap();
+    let path_prefix = parse.path();
     let url = url.trim_end_matches("/");
     stream::iter(paths)
         .map(|path| async {
@@ -63,10 +65,10 @@ pub(crate) async fn http(paths: HashSet<String>, url: String) {
                 location,
                 http_size
             };
-            output(&data, &path_prefix.path(), bar.clone());
+            output(&data, path_prefix, &bar);
             Some(0)
         }).collect::<Vec<i32>>().await;
-    println!("Total time elapsed: {}ms", now.elapsed().as_millis());
+    eprintln!("Total time elapsed: {}ms", now.elapsed().as_millis());
 }
 
 pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: Vec<&str>) {
@@ -79,7 +81,7 @@ pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: 
 pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
     match iis {
         true => {
-            eprintln!("Detected IIS - Using a lowercase only wordlist.\n");
+            eprintln!("{}", format!("Detected IIS - Using a lowercase only wordlist.\n").bold());
             wordlist.lines()
                 .map(|a|a.to_lowercase())
                 .collect::<HashSet<String>>()
@@ -124,7 +126,7 @@ fn filter(data: &Data) -> Option<&Data>{
     Some(data)
 }
 
-fn output(data: &Data, prefix: &str, bar: ProgressBar) {
+fn output(data: &Data, prefix: &str, bar: &ProgressBar) {
     match filter(data) {
         Some(data) => {
             bar.println(format!("{0: <4} - {1: >7} - {2: <0} {3: <0}",
