@@ -26,5 +26,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/release/chameleon
           asset_name: permsrq-linux-amd64
-          tag: 0.1
+          tag: 0.11
           overwrite: true
