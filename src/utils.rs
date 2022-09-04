@@ -25,18 +25,22 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
 }
 
 pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
+    eprintln!("Probing {:?} urls", bar.length());
+
     let now = Instant::now();
     let bar = ProgressBar::new(paths.len() as u64);
-    eprintln!("Probing {:?} urls", bar.length());
     let client = args.build_client();
     let url = args.url.trim_end_matches("/");
     let parse = Url::parse(&url).unwrap();
     let path_prefix = parse.path();
+
+    // Parse Filters
     let mut filter_sizes: Vec<&str> = vec![];
     if let Some(fs) = &args.filtersize {
         filter_sizes = fs.split(",").collect();
     }
     let filter_codes = &args.filtercode.split(",").collect::<Vec<&str>>();
+
     stream::iter(paths)
         .map(|path| async {
             bar.inc(1);
