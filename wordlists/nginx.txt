@@ -1,8 +1,8 @@
 50x.html
 conf
 conf/
-conf/fastcgi_params
 conf/fastcgi.conf
+conf/fastcgi_params
 conf/koi-utf
 conf/koi-win
 conf/mime.types
@@ -12,8 +12,8 @@ conf/uwsgi_params
 conf/win-utf
 contrib
 contrib/
-contrib/geo2nginx.pl
 contrib/README
+contrib/geo2nginx.pl
 contrib/unicode2nginx
 contrib/unicode2nginx/koi-utf
 contrib/unicode2nginx/unicode-to-nginx.pl
@@ -35,7 +35,7 @@ html/index.html
 index.html
 logs
 logs/
+nginx.conf
 nginx.exe
 temp
 temp/
-nginx.conf

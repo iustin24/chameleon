@@ -1,56 +1,4 @@
-
-"@api.route(API_SINGLE_FORMAT.format(resourceName), methods",3
-"@app.route(..., methods",351
-"@app.route(API_ROOT + FB_WEBHOOK, methods",2
-"@app.route(NAMESPACE, methods",66
-"@app.route(ServerConfig.URL.DETECT, methods",2
-"@app.route(URI, methods",5
-"@app.route(WEBHOOK_URL_PATH, methods",14
-"@app.route(auth_access_control, methods",3
-"@app.route(auth_projects, methods",3
-"@app.route(auth_roles, methods",3
-"@app.route(auth_token, methods",3
-"@app.route(base_url, methods",3
-"@app.route(client_ul20_command, methods",3
-"@app.route(config.endpoint, methods",10
-"@app.route(external_login_callback_url, methods",3
-"@app.route(external_login_url, methods",3
-"@app.route(full_url, methods",6
-"@app.route(path, methods",6
-"@app.route(query_context_url, methods",3
-"@app.route(register_context_url, methods",3
-"@app.route(server_url, methods",15
-"@app.route(update_context_url, methods",3
-"@app.route(uri, methods",5
-"@decorators.detail_route(permission_classes=[permissions.IsAdminUser], methods",46
-"@detail_route(permission_classes=[CanPublishContent], methods",4
-"@self._app.route(self._path, methods",14
-"@self._app.route(self._url, methods",18
-"@self.app.route(route, methods",5
-"@server.route(self.endpoint, methods",2
-"@session.route(SessionCollection.BASE_URI, methods",2
-%s
-%s/1
-%s/list
-%s/post
-%s/reset-password
-%s/types
 .json
-
-#api
-#data
-#secret
-%s/
-%s/1/file/
-%s/applications
-%s/entry
-%s/get_metadata
-%s/listall
-%s/search
-%s/test
-%s/test/
--project/-bitbucket-hook
--project/-github-hook
 0/dispositivos
 1
 1-1/markread
@@ -257,6 +205,8 @@
 1/preview
 1/preview/pdfmaxpage
 1/priority
+1/problem
+1/problem/1
 1/product-create
 1/products/1
 1/products/delete/1
@@ -314,6 +264,7 @@
 1/tasks/redundancy
 1/tasks/scheduler
 1/tasks/taskpresentereditor
+1/team/1/acceptation
 1/text
 1/threads/
 1/to_pretrained
@@ -341,6 +292,7 @@
 1/vote/1/
 1/watchs/
 1/watchs/1/
+1/wiki/
 1/xentropy
 15
 1;create
@@ -350,8 +302,6 @@
 4
 404
 500
-:1/1/1/save!
-<regex(
 A
 A/1
 A/1/Q
@@ -404,6 +354,7 @@ S3/user
 S3/user/1
 S3/user/1/caps
 S3/user/1/subuser/1/key
+SESSIONS
 ThreatKB/bookmarks
 ThreatKB/cfg_category_range_mapping/1
 ThreatKB/cfg_settings/1
@@ -430,6 +381,7 @@ XSS_param
 XSS_param/1
 _
 _/1
+__heartbeat__
 _add_category
 _auth/login
 _auth/logout
@@ -543,6 +495,7 @@ acl/1/unwatch/
 acl/1/watch/
 acl/pending/approve
 acl/pending/deny
+aclswitch
 acrewstic/tasks/1
 act/1/1
 action
@@ -904,6 +857,7 @@ answered/
 antelope_acoustic/list
 anything
 api
+api.vars
 api/
 api/%s/metadata/devices
 api/%s/users/1/devices
@@ -1368,6 +1322,16 @@ api/queries/format
 api/query
 api/questions/1
 api/queue/1
+api/random/node
+api/random/node/1
+api/random/param
+api/random/param/1
+api/random/service
+api/random/service/1
+api/random/topic
+api/random/topic/1
+api/random/topic_data/1
+api/random/topic_stream/1
 api/rankings
 api/recognize
 api/records
@@ -1657,11 +1621,11 @@ api/v2/verify
 api/v3/admin/category/1
 api/v3/desktop/1
 api/v3/user
-api/v_{}/correlation
-api/v_{}/gen_dropdown
-api/v_{}/mapping
-api/v_{}/traits/1
-api/v_{}/traits/1.1
+api/v_random/correlation
+api/v_random/gen_dropdown
+api/v_random/mapping
+api/v_random/traits/1
+api/v_random/traits/1.1
 api/vehicles/1
 api/verify_email
 api/version
@@ -1689,16 +1653,6 @@ api/workflow/1/page
 api/workflow/1/process
 api/workflow/1/submit
 api/workflow/1/transfer
-api/{v}/node
-api/{v}/node/1
-api/{v}/param
-api/{v}/param/1
-api/{v}/service
-api/{v}/service/1
-api/{v}/topic
-api/{v}/topic/1
-api/{v}/topic_data/1
-api/{v}/topic_stream/1
 api_keys
 api_keys.revoke
 apiai
@@ -1730,6 +1684,8 @@ apps
 apps/
 apps/1
 apps/1/
+apps/1/http-push
+apps/1/location-service
 apps/bundles/1/1/checkModifications
 apps/bundles/1/1/updateMessage
 aqxapi/v1/system
@@ -1826,6 +1782,7 @@ auth_totp/login
 authenticate
 authenticate-login
 authenticate/
+authentication
 authentication/1
 authitem
 authitem/1
@@ -2208,7 +2165,7 @@ charts
 charts/1
 chat
 check
-check/{check_id}
+check/random
 checkCountry/
 checkPOS/
 checkReservation
@@ -2510,6 +2467,7 @@ controllers/pythoncall
 controllers/shell
 conventions
 convert
+convert-a-card
 convert/1/input/1
 cookbooks/1
 cookie
@@ -2589,6 +2547,7 @@ create_user/
 createapp
 createstorageaccount
 creator
+credentialset
 crop-list/edit/1
 crunch
 csrf-token
@@ -2646,6 +2605,7 @@ dashboard
 dashboard/
 dashboard/1
 dashboard/configure
+dashboard/delete_result
 dashboard/deploy
 dashboard/find
 dashboard/load/1
@@ -2774,6 +2734,7 @@ desc/single/1
 descriptors
 design/1
 desktop-upload
+destroy
 destroy_all
 detach
 detail
@@ -2791,11 +2752,15 @@ device/1/product
 device_names
 devices
 devices/1
+devices/1/statistician/daily
+devices/1/statistician/hourly
+devices/batch
 devices/forget
 devlogin
 dfl
 dgraph/
 dgraph/1/
+dhcp_settings_get
 diagnostics/ping/1/1
 diary/edit/1
 dig
@@ -2880,12 +2845,15 @@ domains/1/sync
 domains/1/touch
 domains/sync
 donate
+donate/
+donate/callback/1/
 dont/transact/me/bro/
 dopost/
 dork/
 dork/1/
 dothenlp
 dotransfer
+down
 download
 download/
 download/1
@@ -2896,6 +2864,7 @@ download/send_csv
 download_excel
 download_manifest/1
 downloads/1
+dpid_data
 draft-services
 draft-services/1
 draft-services/1/publish
@@ -3181,6 +3150,7 @@ find
 findadmin/dataloader
 finish
 finished
+firewall
 first-login/
 flag
 flag_sharing
@@ -3206,6 +3176,7 @@ floodlight/unblock
 floodlight/unblock-all
 floodlight/unblock-switch
 flow
+flow_data
 flows
 flush/artifacts
 flush/validations
@@ -3248,6 +3219,7 @@ form_sent
 format
 format-document-for-preview/
 format/
+formatted
 forum/1-1/edit
 forum/1/edit
 forum/<model(
@@ -3280,6 +3252,7 @@ galidselect/
 galleries
 gallery
 game
+game/1/change
 game/1/update
 game/new
 game_servers
@@ -3292,7 +3265,11 @@ games/1
 games/1/sgf
 games/all
 games/match_id/1
+gateways
 gateways/
+gateways/1
+gateways/1/statistician/daily
+gateways/1/statistician/hourly
 gather
 gauge/1
 gauges/list/1/1/1/1/1
@@ -3303,6 +3280,7 @@ gcodefiles/1
 gcodefiles/delete
 gcodefiles/load
 gcodefiles/refresh
+gcodefiles/upload
 gconnect
 gdrive/watch/callback
 gen-csrf
@@ -3378,6 +3356,7 @@ get_metadata_times/1
 get_multistream/1/1/1/1/1/1
 get_mutiLine_maxUser/
 get_my_ip/
+get_nat_config
 get_netcdf/1/1/1/1/1/1/1
 get_newVsimTestInforTable/
 get_node_property
@@ -3440,6 +3419,7 @@ github/update-pr-review-comments/1
 github/update-pr/1
 github_callback
 github_redirect
+giveme400
 glance/1
 glossary
 gnupg-keys/1
@@ -3572,6 +3552,7 @@ honeymap/
 honor/1
 hook
 hospital
+host
 host/1/category/1/url/new
 host/add
 host/maintain
@@ -3590,9 +3571,10 @@ housing
 hr_holidays/refuse
 hr_holidays/validate
 hsm
+http
 https-limitations/
 hunts
-hunts/{id}
+hunts/random
 hw_proxy/open_cashbox
 i/1/
 i/1/edit/
@@ -3728,6 +3710,7 @@ insert_collection/
 insert_manulVsim/
 insert_newvsimtest_info_table/
 inside/cluster/scaleout/
+inspect_image
 instagram_connect/
 install
 install/
@@ -4016,6 +3999,8 @@ logs
 logs/
 logs/1
 logs/1/
+logs/1/1
+logs/1/1/1
 logs/get_html
 londonassemblies
 longtask
@@ -4127,6 +4112,8 @@ megacities/
 mem
 member
 member_information
+member_list
+member_list_for_app
 memberlist
 members
 members/1
@@ -4166,6 +4153,7 @@ metadata/1
 metadata/1/
 metadata/devices
 metastasis/
+meter_data
 metric
 metrics
 metrics/expand
@@ -4232,6 +4220,8 @@ movie_question
 movies
 mrp/upload_attachment
 msg
+msg-down
+msg-up
 multimethod
 multiply
 music
@@ -4344,8 +4334,13 @@ namespaces/1/deployments/1
 namespaces/1/pods/1
 namespaces/1/replicasets/1
 namespaces/1/services/1
+nat_setings
+nat_settings_get
+nat_settings_init
+nat_settings_save
 nba/
 neighbors
+net-fa
 network
 network/1
 network/1/info
@@ -4461,6 +4456,7 @@ nums/
 oai2d
 oaipmh
 oauth
+oauth-connect
 oauth/
 oauth/1
 oauth/1/1
@@ -4670,6 +4666,9 @@ perm/1
 permissions
 perms
 person
+person-to-person
+person-to-work
+person/1
 person/add
 person_form
 pets
@@ -4700,6 +4699,7 @@ ping/send
 pinned/1
 pks/add
 pks/lookup
+place
 placetypes
 placetypes/
 placetypes/1
@@ -5012,12 +5012,15 @@ project_folder
 project_folder/delete
 projects
 projects/
+projects/1
 projects/1/
+projects/1/1
 projects/1/issues/1.html
 projects/1/issues/1.svg
 projects/1/tasks/
 projects/1/topics/1
 projects/1/topics/1/comments/1
+projects/yml/1
 promoteuser/1
 promotions
 promotions/1
@@ -5115,9 +5118,11 @@ python/1
 python3
 q
 qos
+qos_data
 quaks/1
 quarks
 quarks/1
+quarter_grades
 quattroshapes/id/1
 quattroshapes/id/1/
 query
@@ -5179,11 +5184,19 @@ radio/api/v1/schedule/1
 radiuscheck
 random
 random/
+random/export
+random/export/1
+random/login
+random/thumbnail/1/1
+random/users
 range
 rank
 ranking
 rate
 rate/1/submit_feedback
+rate_for_app
+rate_for_member
+rate_for_port
 rating-post
 rating/1/1/submit_feedback
 rating/1/submit_feedback
@@ -5220,9 +5233,23 @@ recommendations/1
 reconcile
 record
 record/
+record/1
+record/1/
 record/1/1
+record/1/citations
 record/1/edit
+record/1/export
+record/1/export/1
+record/1/files
+record/1/keywords
+record/1/load/authors/
+record/1/load/authors/1/to/1
+record/1/load/files/
+record/1/load/files/1/to/1
+record/1/metadata
+record/1/references
 record/1/tags
+record/1/usage
 recording
 recordings/1
 records
@@ -5238,6 +5265,7 @@ redirect303
 refextract/text
 refextract/url
 refine_search
+refmon
 refresh
 refresh_protected
 reg
@@ -5558,7 +5586,9 @@ room_info
 rooms
 round
 route
+route,count
 route3/
+router
 router/edit
 router/get_config
 routes
@@ -5717,6 +5747,7 @@ select_region
 selectmpl/
 sell
 semanticize/1
+semester_grades
 send
 send-magic-link/1
 send-multiple
@@ -5958,6 +5989,7 @@ simplefitter_2D
 simplefitter_3D
 simplegeo/id/1
 simplegeo/id/1/
+simpleswitch
 simquery
 simulate/
 singer
@@ -6072,6 +6104,7 @@ start-activity
 start-ci
 start/
 start_crawler
+start_router_test
 start_run
 start_test/1
 stat/1
@@ -6157,6 +6190,9 @@ style-guide
 subcategories
 subdivisions
 subdomains
+subject-to-subject
+subject-to-work
+subject/1
 subjectcodes/
 subjects/1
 submission
@@ -6230,6 +6266,7 @@ swarm
 swift/containers/1/objects/1
 switch-filters/1
 switch/create
+switch_set
 switches
 switches/1
 switches/1/machines
@@ -6392,9 +6429,12 @@ test_options_and_not_auto
 test_request
 test_result/1
 test_result/1/edit
+test_result/1/state
 test_result/1/status
+test_set/1
 test_set/1/delete
 test_set/create
+test_uh
 test_uploadExcel
 testfunc
 testing
@@ -6466,7 +6506,7 @@ todos
 todos/
 todos/1
 todos/1/toggle
-todos/{uid}
+todos/random
 toggle
 toggle_user/1
 toggletag
@@ -6515,6 +6555,7 @@ topictracker/1-1/delete
 topictracker/1/add
 topictracker/1/delete
 topology
+topology_info
 toptwtr
 tos
 tpl/1
@@ -6525,6 +6566,7 @@ track/1/
 tracks/album/1
 train
 trans
+trans-status
 transact/me/bro/
 transaction
 transactions
@@ -6535,6 +6577,7 @@ transfer
 transfers
 transfers/1/samples/1/files/1
 transform
+transition
 translate
 translate/1/1/
 translation/1
@@ -6779,6 +6822,7 @@ user/shortlist/1
 user/shows/1
 user/signin
 user/signup
+user/steam
 user/survey
 user/togglesuperadmin/1
 user/upd/
@@ -6801,6 +6845,7 @@ useragent
 userarea
 userdel/
 userdel/index/
+useredit
 useredit/
 useredit/index/
 usergroup/addmanager
@@ -7031,6 +7076,7 @@ view
 view-address
 view-config/1
 view-report/1
+view-submission
 view/
 view/1
 view/1/
@@ -7045,6 +7091,7 @@ visualizations/1
 visualize-lr
 visualize-network
 viz
+vlan
 vnf-connectivity/1
 vnfs
 vnfs/1
@@ -7061,16 +7108,16 @@ vote
 vote/1
 vote/zero
 voting/api/v1/candidates/name/1
+vrandom/ocr
 vtep/neighbors
-vtep/neighbors/{address}
+vtep/neighbors/random
 vtep/networks
-vtep/networks/{vni}
-vtep/networks/{vni}/clients
-vtep/networks/{vni}/clients/{mac}
+vtep/networks/random
+vtep/networks/random/clients
+vtep/networks/random/clients/random
 vtep/speakers
 vulnerabilities/1
 vysledky/
-v{}/ocr
 wait
 wards/2010/
 wards/2014/
@@ -7153,10 +7200,13 @@ woe/id/1/
 word
 words
 work
+work-to-work
+work/1
 worker
 worker_complete
 worker_submitted
 workers
+workers/1/
 workflow/1
 workflow_details
 workflows
@@ -7228,182 +7278,6 @@ xmlrpc/2/1
 xss
 yadage/workflow_submit
 yaml
-zip
-zip_parse
-zrobione
-zzz_post
-1
-1.json
-1/1
-1/1/1
-1/problem
-1/problem/1
-1/team/1/acceptation
-1/wiki/
-SESSIONS
-__heartbeat__
-aclswitch
-admin
-api.vars
-apps
-apps/1
-apps/1/http-push
-apps/1/location-service
-authentication
-build
-collection/1
-contact
-containers
-control/command
-control/connection
-control/connection/options
-control/custom
-control/job
-control/jog
-control/sd
-control/temperature
-convert-a-card
-create
-credentialset
-customize
-dashboard
-dashboard/delete_result
-delete
-delete/1/
-destroy
-devices
-devices/1
-devices/1/statistician/daily
-devices/1/statistician/hourly
-devices/batch
-dhcp_settings_get
-donate/
-donate/callback/1/
-down
-dpid_data
-edit
-firewall
-flow_data
-foo
-formatted
-game/1/change
-gateways
-gateways/1
-gateways/1/statistician/daily
-gateways/1/statistician/hourly
-gcodefiles
-gcodefiles/1
-gcodefiles/delete
-gcodefiles/load
-gcodefiles/refresh
-gcodefiles/upload
-get_nat_config
-giveme400
-glossary
-groups
-groups/1
-health
-host
-http
-images
-inspect_image
-load
-login
-logo
-logout
-logs/1
-logs/1/1
-logs/1/1/1
-member_list
-member_list_for_app
-meter_data
-msg-down
-msg-up
-nat_setings
-nat_settings_get
-nat_settings_init
-nat_settings_save
-net-fa
-new
-new/
-oauth-connect
-patch
-person-to-person
-person-to-work
-person/1
-ping
-place
-projects
-projects/1
-projects/1/1
-projects/yml/1
-qos_data
-quarter_grades
-rate_for_app
-rate_for_member
-rate_for_port
-record/1
-record/1/
-record/1/citations
-record/1/export
-record/1/export/1
-record/1/files
-record/1/keywords
-record/1/load/authors/
-record/1/load/authors/1/to/1
-record/1/load/files/
-record/1/load/files/1/to/1
-record/1/metadata
-record/1/references
-record/1/usage
-refmon
-register
-remove
-reset-password
-route,count
-router
-scan
-search
-semester_grades
-services
-settings
-setup
-simpleswitch
-start
-start_router_test
-state
-stop
-subject-to-subject
-subject-to-work
-subject/1
-summary
-switch_set
-system
-task
-test
-test_result/1/state
-test_set/1
-test_uh
-tests
-timelapse
-timelapse/1
-topology_info
-trans-status
-transition
-upload
-user/profile
-user/steam
-useredit
-users
-users/1
-users/1/password
-view-submission
-visualize-lr
-visualize-network
-vlan
-work-to-work
-work/1
-workers/1/
 yml
 youraccount/
 youraccount/access
@@ -7414,8 +7288,7 @@ youraccount/logout
 youraccount/lost
 youraccount/register
 youraccount/view
-{0}/export
-{0}/export/1
-{0}/login
-{0}/thumbnail/1/1
-{0}/users
+zip
+zip_parse
+zrobione
+zzz_post

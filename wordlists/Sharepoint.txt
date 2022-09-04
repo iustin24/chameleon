@@ -52,7 +52,6 @@ _layouts/1033/createws.aspx
 _layouts/1033/cspp1.aspx
 _layouts/1033/cspp2.aspx
 _layouts/1033/default.aspx
-_layouts/1033/default.aspx
 _layouts/1033/deletemu.aspx
 _layouts/1033/deleteweb.aspx
 _layouts/1033/discbar.aspx
@@ -286,7 +285,6 @@ _layouts/3082/createmysite.aspx
 _layouts/3082/createws.aspx
 _layouts/3082/cspp1.aspx
 _layouts/3082/cspp2.aspx
-_layouts/3082/default.aspx
 _layouts/3082/default.aspx
 _layouts/3082/deletemu.aspx
 _layouts/3082/deleteweb.aspx
@@ -1074,7 +1072,6 @@ avreport.htm
 backlinks.aspx
 barcodeimagefromitem.aspx
 bdcadminui/addbdcaction.aspx
-bdcadminui/addbdcapplication.aspx
 bdcadminui/addbdcapplication.aspx
 bdcadminui/bdcapplications.aspx
 bdcadminui/bdcentities.aspx

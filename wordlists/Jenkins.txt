@@ -29,8 +29,8 @@ script
 securityRealm/
 securityRealm/createAccount
 signup
-systeminf
 systemInfo
+systeminf
 threadDump
 toggleCollapse?paneId=buildQueue
 toggleCollapse?paneId=executors

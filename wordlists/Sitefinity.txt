@@ -4,12 +4,12 @@ Primer/default.aspx
 Primer/default.aspx.cs
 Primer/default.aspx.designer.cs
 Primer/resources
+Primer/resources/Sprite.png
 Primer/resources/ajax-loader.gif
 Primer/resources/background.png
 Primer/resources/done.jpg
 Primer/resources/primer.min.css
 Primer/resources/primer.min.js
-Primer/resources/Sprite.png
 Public
 Public/Services
 Public/Services/Ecommerce
@@ -125,8 +125,8 @@ Services/Newsletters/Subscriber.svc
 Services/Newsletters/SystemStats.svc
 Services/Pages
 Services/Pages/ControlPropertyService.svc
-Services/Pages/PagesService.svc
 Services/Pages/PageTemplatesService.svc
+Services/Pages/PagesService.svc
 Services/Pages/ZoneEditorService.svc
 Services/Publishing
 Services/Publishing/PublishingService.svc
@@ -137,9 +137,9 @@ Services/Security/MembershipSettings.svc
 Services/Security/Permissions.svc
 Services/Security/Roles.svc
 Services/Security/Users.svc
-Services/SitefinityProject.svc
 Services/SiteSync
 Services/SiteSync/SiteSyncService.svc
+Services/SitefinityProject.svc
 Services/Taxonomies
 Services/Taxonomies/FlatTaxon.svc
 Services/Taxonomies/HierarchicalTaxon.svc

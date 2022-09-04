@@ -1,3 +1,5 @@
+components/com_ContentBlogList/
+components/com_Mochigames/
 components/com_acajoom/
 components/com_aclassf/
 components/com_acmisc/
@@ -26,7 +28,6 @@ components/com_comprofiler/
 components/com_contact/
 components/com_contactus/
 components/com_content/
-components/com_ContentBlogList/
 components/com_cronjobs/
 components/com_customquickicons/
 components/com_dhforum/
@@ -65,6 +66,7 @@ components/com_idoblog/
 components/com_intuit/
 components/com_intuitLocal/
 components/com_invite/
+components/com_j-projects/
 components/com_jabode/
 components/com_jbook/
 components/com_jbudgetsmagic/
@@ -83,7 +85,6 @@ components/com_joomlastats/
 components/com_joomlaxplorer/
 components/com_joomportfolio/
 components/com_joomunity/
-components/com_j-projects/
 components/com_jreservation/
 components/com_jshop/
 components/com_jsjobs/
@@ -97,7 +98,6 @@ components/com_mailto/
 components/com_media/
 components/com_messages/
 components/com_messenger/
-components/com_Mochigames/
 components/com_morfeoshow/
 components/com_moschat/
 components/com_mosres/
@@ -130,7 +130,6 @@ components/com_rss/
 components/com_schools/
 components/com_search/
 components/com_sef/
-components/com_sef/
 components/com_seminar/
 components/com_seyret/
 components/com_shoutbox/
@@ -157,8 +156,6 @@ components/com_webcamxp/
 components/com_weblinks/
 components/com_weblogs/
 components/com_wrapper/
-components/com_wrapper/
-components/com_wrapper/
 components/com_xmap/
 components/com_zcalendar/
 components/js_relevant/
@@ -183,9 +180,9 @@ modules/mod_forme/
 modules/mod_gk_news_image/
 modules/mod_internetradio/
 modules/mod_internetradio2/
+modules/mod_ja_slwi/
 modules/mod_jabulletin/
 modules/mod_janewsflash/
-modules/mod_ja_slwi/
 modules/mod_jms_support/
 modules/mod_latestnews/
 modules/mod_login/
@@ -245,10 +242,10 @@ templates/rhuk_milkyway/
 templates/rt_hivemind_j15/
 templates/rt_mediamogul_essentials_j15/
 templates/rt_nexus_j15/
-templates/siteground99/
 templates/siteground-j15-14/
 templates/siteground-j15-68/
 templates/siteground-j15-86/
+templates/siteground99/
 templates/system/
 templates/yoo_phoenix/
 templates/yoo_waybeyond/

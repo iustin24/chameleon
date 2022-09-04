@@ -1,4 +1,3 @@
-*.jsp
 Adaptador
 Admin
 AggreSpy
