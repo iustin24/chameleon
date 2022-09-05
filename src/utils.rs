@@ -6,6 +6,7 @@ use indicatif::ProgressBar;
 use rand::{distributions::Alphanumeric, Rng};
 use std::collections::HashSet;
 use std::time::Instant;
+use reqwest::header::ACCEPT_ENCODING;
 use url::Url;
 use wappalyzer::Analysis;
 //use std::process::Command;
@@ -25,10 +26,11 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
 }
 
 pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
-    eprintln!("Probing {:?} urls", bar.length());
 
     let now = Instant::now();
     let bar = ProgressBar::new(paths.len() as u64);
+    eprintln!("Probing {:?} urls", bar.length());
+
     let client = args.build_client();
     let url = args.url.trim_end_matches("/");
     let parse = Url::parse(&url).unwrap();
@@ -53,7 +55,6 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
         .buffer_unordered(args.concurrency as usize)
         .filter_map(|(path, response)| async {
             let r = response.ok()?;
-
             let http_code = r.status().to_string()[0..3].to_owned();
             if filter_codes.contains(&&**&http_code) {
                 return None;
@@ -64,7 +65,6 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
             } else {
                 String::from("")
             };
-
             let http_size = match r.content_length() {
                 Some(t) => t as i64,
                 None => match r.bytes().await {
@@ -75,7 +75,6 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
             if filter_sizes.contains(&&**&human_size(http_size)) {
                 return None;
             }
-
             let data = Data {
                 path,
                 http_code,

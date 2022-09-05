@@ -8,9 +8,9 @@ build = "src/build.rs"
 [dependencies]
 wappalyzer = { git = "https://github.com/iustin24/wappalyzer?" }
 config = "0.13.1"
-reqwest = { version = "0.10", default-features = false, features=["rustls-tls"]}
-tokio = { version = "0.2", features = ["macros"] }
-futures = "0.3"
+reqwest = { version = "0.11.11", features = ["rustls-tls"] }
+tokio = { version = "1.21.0", features = ["full"] }
+futures = "0.3.24"
 url = "2.2.2"
 rand = "0.8.4"
 indicatif = "0.16.2"
