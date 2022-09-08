@@ -799,6 +799,8 @@ dependencies = [
 [[package]]
 name = "feroxfuzz"
 version = "0.1.0-rc.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a481d3ed4eb475f71d0e11ec01d7167e0a633ddd2a0eef534904a639a2ed23e3"
 dependencies = [
  "async-trait",
  "cfg-if 1.0.0",
