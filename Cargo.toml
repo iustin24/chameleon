@@ -18,5 +18,5 @@ colored = "2.0.0"
 clap = { version = "3", features = ["derive"]}
 anyhow = "1.0.57"
 dirs = "4.0.0"
-feroxfuzz = { path = "../feroxfuzz" }
+feroxfuzz = "0.1.0-rc.0"
 itertools = "0.10.3"
