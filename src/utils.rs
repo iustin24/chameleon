@@ -47,13 +47,27 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
     let deciders = FilterDecider::new(args, |args, code, length, _state| {
-        if args.filtercode.contains(&code) {
+        if let Some(mc) = &args.matchcode {
+            return if mc.contains(&code) {
+                Action::Keep
+            } else {
+                Action::Discard
+            }
+        }
+        else if let Some(ms) = &args.matchsize {
+            return if ms.contains(&length) {
+                Action::Keep
+            } else {
+                Action::Discard
+            }
+        }
+        else if args.filtercode.contains(&code) {
             Action::Discard
         } else if let Some(fs) = &args.filtersize {
-            if fs.contains(&length) {
-                return Action::Discard;
+            return if fs.contains(&length) {
+                Action::Discard
             } else {
-                return Action::Keep;
+                Action::Keep
             }
         } else {
             Action::Keep
@@ -110,7 +124,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     fuzzer.set_post_send_logic(LogicOperation::And);
 
     fuzzer.fuzz_once(&mut state).await.unwrap();
-    println!("{state:#}");
+    //println!("{state:#}");
     eprintln!("Total time elapsed: {}ms", now.elapsed().as_millis());
 }
 

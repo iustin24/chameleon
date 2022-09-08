@@ -94,6 +94,26 @@ pub struct Args {
     pub(crate) filtercode: Vec<u16>,
 
     #[clap(
+    short = 's',
+    long = "ms",
+    help = "Match HTTP response size. Comma separated list of sizes and ranges",
+    multiple = true,
+    use_value_delimiter = true,
+    value_delimiter = ','
+    )]
+    pub(crate) matchsize: Option<Vec<usize>>,
+
+    #[clap(
+    short = 'M',
+    long = "mc",
+    help = "Match HTTP status codes from response - Comma separated list",
+    multiple = true,
+    use_value_delimiter = true,
+    value_delimiter = ','
+    )]
+    pub(crate) matchcode: Option<Vec<u16>>,
+
+    #[clap(
         short = 'U',
         long = "user-agent",
         help = "Change the value for the user-agent header",
