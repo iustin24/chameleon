@@ -16,8 +16,6 @@ async fn main() {
 
     let mut main_wordlist = args.get_main_wordlist_str(&settings).unwrap();
 
-    let small_wordlist = args.get_small_wordlist_str(&settings).unwrap();
-
     let tech_url = match &args.tech_url {
         Some(url) => url,
         _ => &args.url,
@@ -51,7 +49,7 @@ async fn main() {
                 });
                 Some(0)
             })
-            .collect::<Vec<i8>>();
+            .for_each(drop);
     }
 
     for fg in &tech {
@@ -74,7 +72,7 @@ async fn main() {
         match args.get_extensions(&settings, &fg.name) {
             Some(t) => utils::add_extensions(
                 &mut main_wordlist,
-                &small_wordlist,
+                &args.get_small_wordlist_str(&settings).unwrap(),
                 t.split(",").collect::<Vec<&str>>(),
             ),
             None => (),
@@ -93,8 +91,7 @@ async fn main() {
                 category: String::from("Web Application Frameworks"),
             }),
         ),
-        //args.url,
-        &args
+        &args,
     )
     .await;
 }

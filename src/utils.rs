@@ -1,23 +1,23 @@
+mod decider;
+use crate::utils::decider::FilterDecider;
 use crate::Args;
-use clap::Parser;
 use colored::Colorize;
-use futures::{stream, StreamExt};
+use feroxfuzz::client::AsyncClient;
+use feroxfuzz::corpora::Wordlist;
+use feroxfuzz::deciders::LogicOperation;
+use feroxfuzz::fuzzers::AsyncFuzzer;
+use feroxfuzz::mutators::ReplaceKeyword;
+use feroxfuzz::observers::ResponseObserver;
+use feroxfuzz::prelude::*;
+use feroxfuzz::processors::ResponseProcessor;
+use feroxfuzz::responses::AsyncResponse;
+use feroxfuzz::responses::Response;
+use feroxfuzz::schedulers::OrderedScheduler;
 use indicatif::ProgressBar;
-use rand::{distributions::Alphanumeric, Rng};
 use std::collections::HashSet;
 use std::time::Instant;
-use reqwest::header::ACCEPT_ENCODING;
 use url::Url;
 use wappalyzer::Analysis;
-//use std::process::Command;
-
-#[derive(Debug)]
-struct Data {
-    path: String,
-    http_code: String,
-    location: String,
-    http_size: i64,
-}
 
 pub(crate) async fn tech_detect(url: &str) -> Analysis {
     eprintln!("{}", format!("Started scanning {}\n", url).bold().green());
@@ -26,66 +26,91 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
 }
 
 pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
-
-    let now = Instant::now();
     let bar = ProgressBar::new(paths.len() as u64);
+    let words = Wordlist::with_words(paths).name("words").build();
+    let mut state = SharedState::with_corpus(words);
+    let now = Instant::now();
     eprintln!("Probing {:?} urls", bar.length());
 
     let client = args.build_client();
-    let url = args.url.trim_end_matches("/");
-    let parse = Url::parse(&url).unwrap();
-    let path_prefix = parse.path();
+    let async_client = AsyncClient::with_client(client);
 
-    // Parse Filters
-    let mut filter_sizes: Vec<&str> = vec![];
-    if let Some(fs) = &args.filtersize {
-        filter_sizes = fs.split(",").collect();
-    }
-    let filter_codes = &args.filtercode.split(",").collect::<Vec<&str>>();
+    let mutator = ReplaceKeyword::new(&"FUZZ", "words");
+    let parse = Url::parse(args.url.as_str()).expect("Invalid URL");
+    let request = Request::from_url(
+        args.url.as_str(),
+        Some(&[ShouldFuzz::URLPath(
+            format!("{}FUZZ", parse.path()).as_ref(),
+        )]),
+    )
+    .unwrap();
+    let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
-    stream::iter(paths)
-        .map(|path| async {
-            bar.inc(1);
-            let response = (&client)
-                .get(format!("{}/{}", url, path).as_str())
-                .send()
-                .await;
-            (path, response)
-        })
-        .buffer_unordered(args.concurrency as usize)
-        .filter_map(|(path, response)| async {
-            let r = response.ok()?;
-            let http_code = r.status().to_string()[0..3].to_owned();
-            if filter_codes.contains(&&**&http_code) {
-                return None;
-            }
-
-            let location = if r.headers().contains_key("Location") {
-                r.headers()["Location"].to_str().ok()?.to_string()
+    let deciders = FilterDecider::new(args, |args, code, length, _state| {
+        if args.filtercode.contains(&code) {
+            Action::Discard
+        } else if let Some(fs) = &args.filtersize {
+            if fs.contains(&length) {
+                return Action::Discard;
             } else {
-                String::from("")
-            };
-            let http_size = match r.content_length() {
-                Some(t) => t as i64,
-                None => match r.bytes().await {
-                    Ok(t) => t.len() as i64,
-                    Err(_) => return None,
-                },
-            };
-            if filter_sizes.contains(&&**&human_size(http_size)) {
-                return None;
+                return Action::Keep;
             }
-            let data = Data {
-                path,
-                http_code,
-                location,
-                http_size,
-            };
-            output(&data, path_prefix, &bar);
-            Some(0)
-        })
-        .collect::<Vec<i32>>()
-        .await;
+        } else {
+            Action::Keep
+        }
+    });
+
+    let response_printer = ResponseProcessor::new(
+        |response_observer: &ResponseObserver<AsyncResponse>, action, _state| {
+            bar.inc(1);
+            if let Some(Action::Keep) = action {
+                bar.println(format!(
+                    "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
+                    match response_observer.status_code().to_string().chars().nth(0) {
+                        Some('2') => format!("{}", &response_observer.status_code()).green(),
+                        Some('3') => format!("{}", &response_observer.status_code()).blue(),
+                        Some('4') => format!("{}", &response_observer.status_code()).yellow(),
+                        Some('5') => format!("{}", &response_observer.status_code()).red(),
+                        _ => format!("{}", &response_observer.status_code()).white(),
+                    },
+                    response_observer.content_length(),
+                    response_observer.url().path(),
+                    match (
+                        response_observer.headers().get("location"),
+                        response_observer.headers().get("Location")
+                    ) {
+                        (Some(location), _) | (_, Some(location)) =>
+                            format!("-> {}", String::from_utf8_lossy(location).to_string()),
+                        _ => String::from(""),
+                    }
+                ));
+            }
+        },
+    );
+
+    let scheduler = OrderedScheduler::new(state.clone()).unwrap();
+    let deciders = build_deciders!(deciders);
+    let mutators = build_mutators!(mutator);
+    let observers = build_observers!(response_observer);
+    let processors = build_processors!(response_printer);
+
+    let threads = args.concurrency;
+
+    let mut fuzzer = AsyncFuzzer::new(
+        threads,
+        async_client,
+        request,
+        scheduler,
+        mutators,
+        observers,
+        processors,
+        deciders,
+    );
+
+    fuzzer.set_post_send_logic(LogicOperation::And);
+
+    fuzzer.fuzz_once(&mut state).await.unwrap();
+    println!("{state:#}");
     eprintln!("Total time elapsed: {}ms", now.elapsed().as_millis());
 }
 
@@ -93,7 +118,7 @@ pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: 
     eprintln!(
         "{}",
         format!(
-            "Generating wordlist using ./wordlists/raft-small-words.txt and extensions: {}\n",
+            "Generating wordlist using supplied small wordlist and extensions: {}\n",
             extensions.join(",")
         )
         .bold()
@@ -120,36 +145,4 @@ pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
             .map(|a| a.to_owned())
             .collect::<HashSet<String>>(),
     }
-}
-
-fn human_size(mut size: i64) -> String {
-    let base = 1024;
-    for unit in vec!["B", "KB", "MB", "GB"] {
-        if (-1024 < size) && (size < 1024) {
-            return format!("{}{}", size, unit);
-        } else {
-            size = size / base;
-        }
-    }
-    format!("{}{}", size, "TB")
-}
-
-fn output(data: &Data, prefix: &str, bar: &ProgressBar) {
-    bar.println(format!(
-        "{0: <4} - {1: >7} - {2: <0} {3: <0}",
-        match &data.http_code.chars().nth(0) {
-            Some('2') => format!("{}", &data.http_code).green(),
-            Some('3') => format!("{}", &data.http_code).blue(),
-            Some('4') => format!("{}", &data.http_code).yellow(),
-            Some('5') => format!("{}", &data.http_code).red(),
-            _ => format!("{}", &data.http_code).white(),
-        },
-        human_size(data.http_size),
-        format!("{}{}", prefix, data.path),
-        if data.location.is_empty() {
-            String::from("")
-        } else {
-            format!("-> {}", data.location)
-        }
-    ));
 }

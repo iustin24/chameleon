@@ -1,117 +1,121 @@
 extern crate dirs;
-use std::collections::{HashMap};
+use anyhow::Result;
+use clap::Parser;
+use config::Config;
+use reqwest::{Client as http, Client};
+use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::time::Duration;
-use clap::Parser;
-use anyhow::Result;
-use config::{Config};
-use reqwest::{Client as http, Client};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 pub struct Args {
     #[clap(
-    short = 'w',
-    long = "wordlist",
-    help = "Main wordlist to use for bruteforcing",
+        short = 'w',
+        long = "wordlist",
+        help = "Main wordlist to use for bruteforcing"
     )]
     pub(crate) wordlist: Option<String>,
 
     #[clap(
-    short = 'W',
-    long = "small-wordlist",
-    help = "Wordlist used to generate files by adding extensions ( FUZZ.%ext )",
+        short = 'W',
+        long = "small-wordlist",
+        help = "Wordlist used to generate files by adding extensions ( FUZZ.%ext )"
     )]
     pub(crate) small_wordlist: Option<String>,
 
     #[clap(
-    short = 'a',
-    long = "tech-detect",
-    help = "Automatically detect technologies with wappalyzer and adapt",
-    takes_value = false,
+        short = 'a',
+        long = "tech-detect",
+        help = "Automatically detect technologies with wappalyzer and adapt",
+        takes_value = false
     )]
     pub(crate) tech_detect: bool,
 
     #[clap(
-    short = 'c',
-    long = "config",
-    help = "Config file to use",
-    default_value = "~/.config/chameleon/config.toml"
+        short = 'c',
+        long = "config",
+        help = "Config file to use",
+        default_value = "~/.config/chameleon/config.toml"
     )]
     pub(crate) config: String,
 
-    #[clap(
-    short = 'u',
-    long = "url",
-    help = "url to scan"
-    )]
+    #[clap(short = 'u', long = "url", help = "url to scan")]
     pub(crate) url: String,
-/*
+    /*
+        #[clap(
+        short = 'H',
+        long = "HTTP Header",
+        help = "HTTP header. Multiple -H flags are accepted."
+        )]
+        pub(crate) header: Option<String>,
+    */
     #[clap(
-    short = 'H',
-    long = "HTTP Header",
-    help = "HTTP header. Multiple -H flags are accepted."
+        short = 't',
+        long = "concurrency",
+        help = "Number of concurrent threads ( default: 200 )",
+        default_value = "200"
     )]
-    pub(crate) header: Option<String>,
-*/
-    #[clap(
-    short = 't',
-    long = "concurrency",
-    help = "Number of concurrent threads ( default: 200 )",
-    default_value = "200"
-    )]
-    pub(crate) concurrency: u16,
+    pub(crate) concurrency: usize,
 
     #[clap(
-    short = 'T',
-    long = "tech url",
-    help = "URL which will be scanned for technologies. By default, this is the same as '-u', however it can be changed using '-T'"
+        short = 'T',
+        long = "tech url",
+        help = "URL which will be scanned for technologies. By default, this is the same as '-u', however it can be changed using '-T'"
     )]
     pub(crate) tech_url: Option<String>,
 
     #[clap(
-    short = 'i',
-    long = "include tech",
-    help = "Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )"
+        short = 'i',
+        long = "include tech",
+        help = "Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )"
     )]
     pub(crate) techs: Option<String>,
 
     #[clap(
-    short = 'S',
-    long = "fs",
-    help = "Filter HTTP response size. Comma separated list of sizes and ranges",
+        short = 'S',
+        long = "fs",
+        help = "Filter HTTP response size. Comma separated list of sizes and ranges",
+        multiple = true,
+        use_value_delimiter = true,
+        value_delimiter = ','
     )]
-    pub(crate) filtersize: Option<String>,
+    pub(crate) filtersize: Option<Vec<usize>>,
 
     #[clap(
-    short = 'f',
-    long = "fc",
-    help = "Filter HTTP status codes from response - Comma separated list",
-    default_value = "404"
+        short = 'C',
+        long = "fc",
+        help = "Filter HTTP status codes from response - Comma separated list",
+        multiple = true,
+        use_value_delimiter = true,
+        value_delimiter = ',',
+        default_value = "404"
     )]
-    pub(crate) filtercode: String,
+    pub(crate) filtercode: Vec<u16>,
 
     #[clap(
-    short = 'U',
-    long = "user-agent",
-    help = "Change the value for the user-agent header",
-    default_value = "Chameleon / https://github.com/iustin24/chameleon"
+        short = 'U',
+        long = "user-agent",
+        help = "Change the value for the user-agent header",
+        default_value = "Chameleon / https://github.com/iustin24/chameleon"
     )]
     pub(crate) useragent: String,
 }
 
 impl Args {
-    pub(crate) fn get_main_wordlist_str(&self, settings: &HashMap<String, String>) -> Result<String> {
+    pub(crate) fn get_main_wordlist_str(
+        &self,
+        settings: &HashMap<String, String>,
+    ) -> Result<String> {
         let output = match self.wordlist {
             Some(ref path) => read_to_string(path)?,
-            None => {
-                read_to_string(self.get_wordlist_path(settings, "main_wordlist").unwrap())?
-            }
+            None => read_to_string(self.get_wordlist_path(settings, "main_wordlist").unwrap())?,
         };
         Ok(output)
     }
     pub(crate) fn build_client(&self) -> Client {
-        let client_builder = http::builder().connect_timeout(Duration::from_secs(5))
+        let client_builder = http::builder()
+            .connect_timeout(Duration::from_secs(5))
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
             //.proxy(reqwest::Proxy::https("http://127.0.0.1:8080").unwrap())
@@ -120,41 +124,52 @@ impl Args {
         client_builder.build().unwrap()
     }
 
-    pub(crate) fn get_small_wordlist_str(&self, settings: &HashMap<String, String>) -> Result<String> {
+    pub(crate) fn get_small_wordlist_str(
+        &self,
+        settings: &HashMap<String, String>,
+    ) -> Result<String> {
         let output = match self.small_wordlist {
             Some(ref path) => read_to_string(path)?,
-            None => {
-                read_to_string(self.get_wordlist_path(settings, "small_wordlist").unwrap())?
-            }
+            None => read_to_string(self.get_wordlist_path(settings, "small_wordlist").unwrap())?,
         };
         Ok(output)
     }
 
-    pub(crate) fn get_wordlist_path<'a>(&self, settings: &'a HashMap<String, String>, wordlist: &str) -> Option<&'a String> {
-        settings.get(&wordlist
-                .replace(" ", "_")
-                .replace(".", "_")
-            )
+    pub(crate) fn get_wordlist_path<'a>(
+        &self,
+        settings: &'a HashMap<String, String>,
+        wordlist: &str,
+    ) -> Option<&'a String> {
+        settings.get(&wordlist.replace(" ", "_").replace(".", "_"))
     }
 
-    pub(crate) fn get_extensions<'a>(&self, settings: &'a HashMap<String, String>, wordlist: &str) -> Option<&'a String> {
-        settings.get(&( wordlist
-            .replace(" ", "_")
-            .replace(".", "_") + "_ext")
-        )
+    pub(crate) fn get_extensions<'a>(
+        &self,
+        settings: &'a HashMap<String, String>,
+        wordlist: &str,
+    ) -> Option<&'a String> {
+        settings.get(&(wordlist.replace(" ", "_").replace(".", "_") + "_ext"))
     }
 
     pub(crate) fn get_config(&self) -> HashMap<String, String> {
         Config::builder()
-            .add_source(config::File::with_name(&self.config.as_str().replace("~", dirs::home_dir().unwrap().to_str().unwrap())))
+            .add_source(config::File::with_name(
+                &self
+                    .config
+                    .as_str()
+                    .replace("~", dirs::home_dir().unwrap().to_str().unwrap()),
+            ))
             .build()
             .unwrap()
             .try_deserialize::<HashMap<String, String>>()
             .unwrap()
             .into_iter()
-            .map(|(key, value)|
-                (key, value.replace("~", dirs::home_dir().unwrap().to_str().unwrap()))
-            )
+            .map(|(key, value)| {
+                (
+                    key,
+                    value.replace("~", dirs::home_dir().unwrap().to_str().unwrap()),
+                )
+            })
             .collect()
     }
 }
