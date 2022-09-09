@@ -27,16 +27,6 @@ In order to use the technology auto-detect feature, you will need to install (he
 
 ## Example Usage:
 
-### Basic Directory Bruteforce:
-```
-> chameleon --url https://www.google.com/
-```
-<br>
-<p align="center">
-  <img width="1200" src="_img/test.png">
-</p>
-<br>
-
 ### Tech Scan + Directory Bruteforce:
 ```
 > chameleon --url https://example.com -a
