@@ -30,7 +30,7 @@ In order to use the technology auto-detect feature, you will need to install (he
 ```
 
 <p align="center">
-  <img width="1200" src="_img/hackerone.png">
+  <img width="1200" src="_img/test.png">
 </p>
 
 ### Options
