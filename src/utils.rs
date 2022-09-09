@@ -122,7 +122,6 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     fuzzer.fuzz_once(&mut state).await.unwrap();
     //println!("{state:#}");
     eprintln!("Total time elapsed: {}ms\n", now.elapsed().as_millis());
-
 }
 
 pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: Vec<&str>) {
@@ -159,17 +158,9 @@ pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
 }
 
 fn filter<T: PartialEq>(vec: &Vec<T>, c: &T, m: bool) -> Action {
-    if vec.contains(c) {
-        if m {
-            Action::Keep
-        } else {
-            Action::Discard
-        }
+    if !vec.contains(c) ^ m {
+        Action::Keep
     } else {
-        if m {
-            Action::Discard
-        } else {
-            Action::Keep
-        }
+        Action::Discard
     }
 }
