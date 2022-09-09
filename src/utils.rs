@@ -51,7 +51,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
             Some(mc) => filter(mc, &code, true),
             _ => Action::Keep
         };
-        if action == Action::Discard {
+        if action == Action::Keep {
             match &args.matchsize {
                 Some(ms) => action = filter(ms, &length, true),
                 _ => ()
