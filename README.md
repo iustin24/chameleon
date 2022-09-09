@@ -4,6 +4,9 @@ Chameleon provides better content discovery by using wappalyzer's set of technol
 
 The tool is highly customizable and allows users to add in their own custom wordlits, extensions or fingerprints.
 
+The full documentation is available on:
+http://youst.in/posts/Better-Content-Discovery-with-Chameleon/
+
 ## Installation
 
 ### Step 1:
@@ -28,10 +31,21 @@ In order to use the technology auto-detect feature, you will need to install (he
 ```
 > chameleon --url https://example.com/ -w /path/to/wordlist -f 404
 ```
-
+<br>
 <p align="center">
   <img width="1200" src="_img/test.png">
 </p>
+<br>
+
+### Tech Scan + Directory Bruteforce:
+```
+> chameleon --url https://example.com -a
+```
+<br>
+<p align="center">
+  <img width="1200" src="_img/h1.png">
+</p>
+<br>
 
 ### Options
 
