@@ -132,7 +132,7 @@ PHP_ext="php"
 
 ~~Update the wappalyzer crate to also support the "implies" feature for better technology detection.~~
 
-~~ Add auto calibration for filtering ~~
+~~Add auto calibration for filtering~~
 
 Add option to add custom headers.
 
