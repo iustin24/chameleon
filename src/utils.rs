@@ -46,32 +46,30 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     .unwrap();
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
-    let deciders = FilterDecider::new(args, |args, code, length, _state| {
-        if let Some(mc) = &args.matchcode {
-            return if mc.contains(&code) {
-                Action::Keep
-            } else {
-                Action::Discard
+    let code_decider = FilterDecider::new(args, |args, code, length, _state| {
+        let mut action = match &args.matchcode {
+            Some(mc) => filter(mc, &code, true),
+            _ => Action::Keep
+        };
+        if action == Action::Discard {
+            match &args.matchsize {
+                Some(ms) => action = filter(ms, &length, true),
+                _ => ()
             }
         }
-        else if let Some(ms) = &args.matchsize {
-            return if ms.contains(&length) {
-                Action::Keep
-            } else {
-                Action::Discard
+        action
+    });
+
+
+    let length_decider = FilterDecider::new(args, |args, code, length, _state| {
+        let mut action = filter(&args.filtercode, &code, false);
+        if action == Action::Keep {
+            match &args.filtersize {
+                Some(fs) => action = filter(fs, &length, false),
+                _ => ()
             }
         }
-        else if args.filtercode.contains(&code) {
-            Action::Discard
-        } else if let Some(fs) = &args.filtersize {
-            return if fs.contains(&length) {
-                Action::Discard
-            } else {
-                Action::Keep
-            }
-        } else {
-            Action::Keep
-        }
+        action
     });
 
     let response_printer = ResponseProcessor::new(
@@ -103,7 +101,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     );
 
     let scheduler = OrderedScheduler::new(state.clone()).unwrap();
-    let deciders = build_deciders!(deciders);
+    let deciders = build_deciders!(code_decider, length_decider);
     let mutators = build_mutators!(mutator);
     let observers = build_observers!(response_observer);
     let processors = build_processors!(response_printer);
@@ -158,5 +156,21 @@ pub(crate) fn sort_wordlist(wordlist: &String, iis: bool) -> HashSet<String> {
             .lines()
             .map(|a| a.to_owned())
             .collect::<HashSet<String>>(),
+    }
+}
+
+fn filter<T: PartialEq>(vec: &Vec<T>, c: &T, m: bool) -> Action {
+    if vec.contains(c) {
+        if m {
+            Action::Keep
+        } else {
+            Action::Discard
+        }
+    } else {
+        if m {
+            Action::Discard
+        } else {
+            Action::Keep
+        }
     }
 }
