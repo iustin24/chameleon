@@ -140,3 +140,6 @@ PHP_ext="php"
 
 Add option to add custom headers.
 
+## Credits 
+
+epi052 - https://github.com/epi052/feroxfuzz/
