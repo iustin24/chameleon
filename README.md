@@ -41,33 +41,49 @@ In order to use the technology auto-detect feature, you will need to install (he
 
 ```
 OPTIONS:
+    -a, --tech-detect
+            Automatically detect technologies with wappalyzer and adapt wordlist
+
+    -A, --auto-calibrate
+            Automatically calibrate filtering options (default: false)
+
     -c, --config <CONFIG>
             Config file to use [default: ~/.config/chameleon/config.toml]
 
-    -f, --fc <FILTERCODE>
+    -C, --fc <FILTERCODE>...
             Filter HTTP status codes from response - Comma separated list [default: 404]
 
     -h, --help
             Print help information
-            
+
     -i, --include tech <TECHS>
             Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )
 
-    -S, --fs <FILTERSIZE>
-            Filter HTTP response size. Comma separated list of sizes and ranges
+    -L, --hosts-file <HOSTS_FILE>
+            List of hosts to scan
+
+    -M, --mc <MATCHCODE>...
+            Match HTTP status codes from response - Comma separated list
+
+    -s, --ms <MATCHSIZE>...
+            Match HTTP response size. Comma separated list of sizes
+
+    -S, --fs <FILTERSIZE>...
+            Filter HTTP response size. Comma separated list of sizes
 
     -t, --concurrency <CONCURRENCY>
             Number of concurrent threads ( default: 200 ) [default: 200]
 
     -T, --tech url <TECH_URL>
-            URL which will be scanned for technologies. By default, the url from  '-u' is used,
+            URL which will be scanned for technologies. By default, this is the same as '-u',
             however it can be changed using '-T'
 
     -u, --url <URL>
             url to scan
 
     -U, --user-agent <USERAGENT>
-            Change the value for the user-agent header [default: "Chameleon / https://github.com/iustin24/chameleon"]
+            Change the value for the user-agent header [default: "Chameleon /
+            https://github.com/iustin24/chameleon"]
 
     -V, --version
             Print version information
@@ -75,7 +91,7 @@ OPTIONS:
     -w, --wordlist <WORDLIST>
             Main wordlist to use for bruteforcing
 
-    -W, --small wordlist <SMALL_WORDLIST>
+    -W, --small-wordlist <SMALL_WORDLIST>
             Wordlist used to generate files by adding extensions ( FUZZ.%ext )
 ```
 
