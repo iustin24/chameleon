@@ -33,7 +33,7 @@ In order to use the technology auto-detect feature, you will need to install (he
 ```
 <br>
 <p align="center">
-  <img width="1200" src="_img/h1.png">
+  <img width="1200" src="_img/Screenshot%202022-09-10%20at%2000.57.25.png">
 </p>
 <br>
 
