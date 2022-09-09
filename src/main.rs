@@ -108,7 +108,7 @@ async fn main() {
                 }),
             ),
             &args,
-            &url
+            &url,
         )
         .await;
     }

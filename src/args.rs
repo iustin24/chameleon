@@ -36,6 +36,14 @@ pub struct Args {
     pub(crate) tech_detect: bool,
 
     #[clap(
+        short = 'A',
+        long = "auto-calibrate",
+        help = "Automatically calibrate filtering options (default: false)",
+        takes_value = false
+    )]
+    pub(crate) auto_calibrate: bool,
+
+    #[clap(
         short = 'c',
         long = "config",
         help = "Config file to use",

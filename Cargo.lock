@@ -272,7 +272,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chameleon"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -285,7 +285,9 @@ dependencies = [
  "itertools",
  "rand 0.8.5",
  "reqwest",
+ "serde",
  "tokio 1.21.0",
+ "typetag",
  "url 2.2.2",
  "wappalyzer",
 ]

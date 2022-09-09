@@ -1,10 +1,11 @@
 mod decider;
-use crate::utils::decider::FilterDecider;
+
+use crate::utils::decider::{CalibrateDecider, FilterDecider, MetadataStruct};
 use crate::Args;
 use colored::Colorize;
 use feroxfuzz::client::AsyncClient;
 use feroxfuzz::corpora::Wordlist;
-use feroxfuzz::deciders::LogicOperation;
+use feroxfuzz::deciders::{LogicOperation};
 use feroxfuzz::fuzzers::AsyncFuzzer;
 use feroxfuzz::mutators::ReplaceKeyword;
 use feroxfuzz::observers::ResponseObserver;
@@ -44,7 +45,22 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
         )]),
     )
     .unwrap();
+
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
+    let auto = calibrate_results(&args, url).await;
+    let calibrate_decider =
+        CalibrateDecider::new(&auto, |auto, length, words, lines, _state| {
+            if args.auto_calibrate {
+                for i in auto {
+                    if i.lines == lines || i.words == words || i.length == length {
+                        return Action::Discard;
+                    }
+                }
+                Action::Keep
+            } else {
+                Action::Keep
+            }
+        });
 
     let match_decider = FilterDecider::new(args, |args, code, length, _state| {
         match match &args.matchcode {
@@ -99,7 +115,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     );
 
     let scheduler = OrderedScheduler::new(state.clone()).unwrap();
-    let deciders = build_deciders!(match_decider, filter_decider);
+    let deciders = build_deciders!(calibrate_decider, match_decider, filter_decider);
     let mutators = build_mutators!(mutator);
     let observers = build_observers!(response_observer);
     let processors = build_processors!(response_printer);
@@ -163,4 +179,71 @@ fn filter<T: PartialEq>(vec: &Vec<T>, c: &T, m: bool) -> Action {
     } else {
         Action::Discard
     }
+}
+
+pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<MetadataStruct> {
+    let words = Wordlist::with_words([".htacessxxx", "adminxxx", "chameleonxxx"])
+        .name("words")
+        .build();
+    let mut state = SharedState::with_corpus(words);
+
+    let client = args.build_client();
+    let async_client = AsyncClient::with_client(client);
+
+    let mutator = ReplaceKeyword::new(&"FUZZ", "words");
+    let parse = Url::parse(url).expect("Invalid URL");
+    let request = Request::from_url(
+        url,
+        Some(&[ShouldFuzz::URLPath(
+            format!("{}FUZZ", parse.path()).as_ref(),
+        )]),
+    )
+    .unwrap();
+
+    let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
+
+    let response_printer = ResponseProcessor::new(
+        |response_observer: &ResponseObserver<AsyncResponse>, _action, state| {
+            state.add_metadata(
+                response_observer.url().path(),
+                MetadataStruct {
+                    length: response_observer.content_length(),
+                    words: response_observer.word_count(),
+                    lines: response_observer.line_count(),
+                },
+            )
+        },
+    );
+
+    let scheduler = OrderedScheduler::new(state.clone()).unwrap();
+    let deciders = build_deciders!();
+    let mutators = build_mutators!(mutator);
+    let observers = build_observers!(response_observer);
+    let processors = build_processors!(response_printer);
+
+    let threads = args.concurrency;
+
+    let mut fuzzer = AsyncFuzzer::new(
+        threads,
+        async_client,
+        request,
+        scheduler,
+        mutators,
+        observers,
+        processors,
+        deciders,
+    );
+    fuzzer.fuzz_once(&mut state).await.unwrap();
+    state
+        .metadata()
+        .read()
+        .unwrap()
+        .values()
+        .map(|b| {
+            b.as_any()
+                .downcast_ref::<MetadataStruct>()
+                .unwrap()
+                .to_owned()
+        })
+        .collect::<Vec<MetadataStruct>>()
 }
