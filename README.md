@@ -29,7 +29,7 @@ In order to use the technology auto-detect feature, you will need to install (he
 
 ### Basic Directory Bruteforce:
 ```
-> chameleon --url https://example.com/ -w /path/to/wordlist -f 404
+> chameleon --url https://www.google.com/
 ```
 <br>
 <p align="center">
