@@ -24,10 +24,13 @@ pub struct Args {
     )]
     pub(crate) small_wordlist: Option<String>,
 
+    #[clap(short = 'L', long = "hosts-file", help = "List of hosts to scan")]
+    pub(crate) hosts_file: Option<String>,
+
     #[clap(
         short = 'a',
         long = "tech-detect",
-        help = "Automatically detect technologies with wappalyzer and adapt",
+        help = "Automatically detect technologies with wappalyzer and adapt wordlist",
         takes_value = false
     )]
     pub(crate) tech_detect: bool,
@@ -41,7 +44,7 @@ pub struct Args {
     pub(crate) config: String,
 
     #[clap(short = 'u', long = "url", help = "url to scan")]
-    pub(crate) url: String,
+    pub(crate) url: Option<String>,
     /*
         #[clap(
         short = 'H',
@@ -75,7 +78,7 @@ pub struct Args {
     #[clap(
         short = 'S',
         long = "fs",
-        help = "Filter HTTP response size. Comma separated list of sizes and ranges",
+        help = "Filter HTTP response size. Comma separated list of sizes",
         multiple = true,
         use_value_delimiter = true,
         value_delimiter = ','
@@ -94,22 +97,22 @@ pub struct Args {
     pub(crate) filtercode: Vec<u16>,
 
     #[clap(
-    short = 's',
-    long = "ms",
-    help = "Match HTTP response size. Comma separated list of sizes and ranges",
-    multiple = true,
-    use_value_delimiter = true,
-    value_delimiter = ','
+        short = 's',
+        long = "ms",
+        help = "Match HTTP response size. Comma separated list of sizes",
+        multiple = true,
+        use_value_delimiter = true,
+        value_delimiter = ','
     )]
     pub(crate) matchsize: Option<Vec<usize>>,
 
     #[clap(
-    short = 'M',
-    long = "mc",
-    help = "Match HTTP status codes from response - Comma separated list",
-    multiple = true,
-    use_value_delimiter = true,
-    value_delimiter = ','
+        short = 'M',
+        long = "mc",
+        help = "Match HTTP status codes from response - Comma separated list",
+        multiple = true,
+        use_value_delimiter = true,
+        value_delimiter = ','
     )]
     pub(crate) matchcode: Option<Vec<u16>>,
 
@@ -133,6 +136,7 @@ impl Args {
         };
         Ok(output)
     }
+
     pub(crate) fn build_client(&self) -> Client {
         let client_builder = http::builder()
             .connect_timeout(Duration::from_secs(5))

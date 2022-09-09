@@ -25,20 +25,20 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
     wappalyzer::scan(url).await
 }
 
-pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
+pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let bar = ProgressBar::new(paths.len() as u64);
     let words = Wordlist::with_words(paths).name("words").build();
     let mut state = SharedState::with_corpus(words);
     let now = Instant::now();
-    eprintln!("Probing {:?} urls", bar.length());
+    eprintln!("Started bruteforcing {} with {:?} paths", url, bar.length());
 
     let client = args.build_client();
     let async_client = AsyncClient::with_client(client);
 
     let mutator = ReplaceKeyword::new(&"FUZZ", "words");
-    let parse = Url::parse(args.url.as_str()).expect("Invalid URL");
+    let parse = Url::parse(url).expect("Invalid URL");
     let request = Request::from_url(
-        args.url.as_str(),
+        url,
         Some(&[ShouldFuzz::URLPath(
             format!("{}FUZZ", parse.path()).as_ref(),
         )]),
@@ -46,30 +46,28 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     .unwrap();
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
-    let code_decider = FilterDecider::new(args, |args, code, length, _state| {
-        let mut action = match &args.matchcode {
+    let match_decider = FilterDecider::new(args, |args, code, length, _state| {
+        match match &args.matchcode {
             Some(mc) => filter(mc, &code, true),
-            _ => Action::Keep
-        };
-        if action == Action::Keep {
-            match &args.matchsize {
-                Some(ms) => action = filter(ms, &length, true),
-                _ => ()
-            }
+            _ => Action::Keep,
+        } {
+            Action::Keep => match &args.matchsize {
+                Some(ms) => filter(ms, &length, true),
+                _ => Action::Keep,
+            },
+            Action::Discard => Action::Discard,
+            _ => Action::Discard,
         }
-        action
     });
 
-
-    let length_decider = FilterDecider::new(args, |args, code, length, _state| {
-        let mut action = filter(&args.filtercode, &code, false);
-        if action == Action::Keep {
-            match &args.filtersize {
-                Some(fs) => action = filter(fs, &length, false),
-                _ => ()
-            }
+    let filter_decider = FilterDecider::new(args, |args, code, length, _state| {
+        match filter(&args.filtercode, &code, false) {
+            Action::Keep => match &args.filtersize {
+                Some(fs) => filter(fs, &length, false),
+                _ => Action::Keep,
+            },
+            _ => Action::Discard,
         }
-        action
     });
 
     let response_printer = ResponseProcessor::new(
@@ -86,7 +84,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
                         _ => format!("{}", &response_observer.status_code()).white(),
                     },
                     response_observer.content_length(),
-                    response_observer.url().path(),
+                    response_observer.url().as_str(),
                     match (
                         response_observer.headers().get("location"),
                         response_observer.headers().get("Location")
@@ -101,7 +99,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
     );
 
     let scheduler = OrderedScheduler::new(state.clone()).unwrap();
-    let deciders = build_deciders!(code_decider, length_decider);
+    let deciders = build_deciders!(match_decider, filter_decider);
     let mutators = build_mutators!(mutator);
     let observers = build_observers!(response_observer);
     let processors = build_processors!(response_printer);
@@ -123,7 +121,8 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args) {
 
     fuzzer.fuzz_once(&mut state).await.unwrap();
     //println!("{state:#}");
-    eprintln!("Total time elapsed: {}ms", now.elapsed().as_millis());
+    eprintln!("Total time elapsed: {}ms\n", now.elapsed().as_millis());
+
 }
 
 pub(crate) fn add_extensions(wordlist: &mut String, words: &String, extensions: Vec<&str>) {
