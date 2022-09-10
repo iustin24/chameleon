@@ -5,7 +5,7 @@ Chameleon provides better content discovery by using wappalyzer's set of technol
 The tool is highly customizable and allows users to add in their own custom wordlits, extensions or fingerprints.
 
 The full documentation is available on:
-http://youst.in/posts/Better-Content-Discovery-with-Chameleon/
+https://youst.in/posts/context-aware-conent-discovery-with-chameleon/
 
 ## Installation
 
