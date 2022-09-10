@@ -4,6 +4,9 @@ Chameleon provides better content discovery by using wappalyzer's set of technol
 
 The tool is highly customizable and allows users to add in their own custom wordlits, extensions or fingerprints.
 
+The full documentation is available on:
+http://youst.in/posts/Better-Content-Discovery-with-Chameleon/
+
 ## Installation
 
 ### Step 1:
@@ -24,46 +27,63 @@ In order to use the technology auto-detect feature, you will need to install (he
 
 ## Example Usage:
 
-### Basic Directory Bruteforce:
+### Tech Scan + Directory Bruteforce:
 ```
-> chameleon --url https://example.com/ -w /path/to/wordlist -f 404
+> chameleon --url https://example.com -a
 ```
-
+<br>
 <p align="center">
-  <img width="1200" src="_img/hackerone.png">
+  <img width="1200" src="_img/Screenshot%202022-09-10%20at%2000.57.25.png">
 </p>
+<br>
 
 ### Options
 
 ```
 OPTIONS:
+    -a, --tech-detect
+            Automatically detect technologies with wappalyzer and adapt wordlist
+
+    -A, --auto-calibrate
+            Automatically calibrate filtering options (default: false)
+
     -c, --config <CONFIG>
             Config file to use [default: ~/.config/chameleon/config.toml]
 
-    -f, --fc <FILTERCODE>
+    -C, --fc <FILTERCODE>...
             Filter HTTP status codes from response - Comma separated list [default: 404]
 
     -h, --help
             Print help information
-            
+
     -i, --include tech <TECHS>
             Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )
 
-    -S, --fs <FILTERSIZE>
-            Filter HTTP response size. Comma separated list of sizes and ranges
+    -L, --hosts-file <HOSTS_FILE>
+            List of hosts to scan
+
+    -M, --mc <MATCHCODE>...
+            Match HTTP status codes from response - Comma separated list
+
+    -s, --ms <MATCHSIZE>...
+            Match HTTP response size. Comma separated list of sizes
+
+    -S, --fs <FILTERSIZE>...
+            Filter HTTP response size. Comma separated list of sizes
 
     -t, --concurrency <CONCURRENCY>
             Number of concurrent threads ( default: 200 ) [default: 200]
 
     -T, --tech url <TECH_URL>
-            URL which will be scanned for technologies. By default, the url from  '-u' is used,
+            URL which will be scanned for technologies. By default, this is the same as '-u',
             however it can be changed using '-T'
 
     -u, --url <URL>
             url to scan
 
     -U, --user-agent <USERAGENT>
-            Change the value for the user-agent header [default: "Chameleon / https://github.com/iustin24/chameleon"]
+            Change the value for the user-agent header [default: "Chameleon /
+            https://github.com/iustin24/chameleon"]
 
     -V, --version
             Print version information
@@ -71,7 +91,7 @@ OPTIONS:
     -w, --wordlist <WORDLIST>
             Main wordlist to use for bruteforcing
 
-    -W, --small wordlist <SMALL_WORDLIST>
+    -W, --small-wordlist <SMALL_WORDLIST>
             Wordlist used to generate files by adding extensions ( FUZZ.%ext )
 ```
 
@@ -132,6 +152,10 @@ PHP_ext="php"
 
 ~~Update the wappalyzer crate to also support the "implies" feature for better technology detection.~~
 
+~~Add auto calibration for filtering~~
+
 Add option to add custom headers.
 
-Add auto calibration for filtering
+## Credits 
+
+epi052 - https://github.com/epi052/feroxfuzz/
