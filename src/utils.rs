@@ -34,6 +34,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     eprintln!("Started bruteforcing {} with {:?} paths", url, bar.length());
 
     let client = args.build_client();
+    client.get(url).send().await.unwrap();
     let async_client = AsyncClient::with_client(client);
 
     let mutator = ReplaceKeyword::new(&"FUZZ", "words");
@@ -136,6 +137,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     fuzzer.set_post_send_logic(LogicOperation::And);
 
     fuzzer.fuzz_once(&mut state).await.unwrap();
+
     //println!("{state:#}");
     eprintln!("Total time elapsed: {}ms\n", now.elapsed().as_millis());
 }

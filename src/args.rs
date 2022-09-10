@@ -44,7 +44,7 @@ pub struct Args {
     pub(crate) auto_calibrate: bool,
 
     #[clap(
-        short = 'c',
+        short = 'k',
         long = "config",
         help = "Config file to use",
         default_value = "~/.config/chameleon/config.toml"
@@ -115,7 +115,7 @@ pub struct Args {
     pub(crate) matchsize: Option<Vec<usize>>,
 
     #[clap(
-        short = 'M',
+        short = 'c',
         long = "mc",
         help = "Match HTTP status codes from response - Comma separated list",
         multiple = true,
@@ -150,7 +150,6 @@ impl Args {
             .connect_timeout(Duration::from_secs(5))
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
-            //.proxy(reqwest::Proxy::https("http://127.0.0.1:8080").unwrap())
             .timeout(Duration::from_secs(5))
             .user_agent(&self.useragent);
         client_builder.build().unwrap()
