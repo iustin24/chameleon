@@ -42,10 +42,7 @@ async fn main() {
         if args.tech_detect {
             match utils::tech_detect(tech_url.as_str()).await.result {
                 Ok(t) => tech = t,
-                Err(e) => eprintln!(
-                    "Failed to detect technologies . Got following error: {} ",
-                    e
-                ),
+                _ => (),
             };
         }
 
