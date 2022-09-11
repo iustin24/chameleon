@@ -26,9 +26,13 @@ async fn main() {
             .map(|a| a.to_string())
             .for_each(|u| urls.push(u)),
         (Some(_), Some(_)) => {
-            panic!("Both url and hosts file supplied. Please only use one argument")
+            eprintln!("Both url and hosts file supplied. Please only use one argument");
+            std::process::exit(1)
         }
-        _ => panic!("No URL supplied."),
+        _ => {
+            eprintln!("No URL supplied. Please use '-u' to supply a url.");
+            std::process::exit(1)
+        }
     }
 
     for url in &urls {
