@@ -5,7 +5,7 @@ Chameleon provides better content discovery by using wappalyzer's set of technol
 The tool is highly customizable and allows users to add in their own custom wordlits, extensions or fingerprints.
 
 The full documentation is available on:
-http://youst.in/posts/Better-Content-Discovery-with-Chameleon/
+https://youst.in/posts/context-aware-conent-discovery-with-chameleon/
 
 ## Installation
 
@@ -20,10 +20,6 @@ Visit https://rustup.rs/ and follow the instructions to get started with rust an
 ```
 Installing the crate will create the directory `~/.config/chameleon/` and download the config file and custom wordlists.
 
-### Step 3:
-
-In order to use the technology auto-detect feature, you will need to install (headless) chrome otherwise you will get the following error:
-`Could not auto detect a chrome executable`
 
 ## Example Usage:
 
