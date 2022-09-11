@@ -20,10 +20,6 @@ Visit https://rustup.rs/ and follow the instructions to get started with rust an
 ```
 Installing the crate will create the directory `~/.config/chameleon/` and download the config file and custom wordlists.
 
-### Step 3:
-
-In order to use the technology auto-detect feature, you will need to install (headless) chrome otherwise you will get the following error:
-`Could not auto detect a chrome executable`
 
 ## Example Usage:
 
