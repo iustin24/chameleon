@@ -277,6 +277,7 @@ dependencies = [
  "futures 0.3.24",
  "indicatif",
  "itertools",
+ "openssl",
  "rand 0.8.5",
  "reqwest",
  "serde",
@@ -1079,7 +1080,7 @@ dependencies = [
 [[package]]
 name = "headless_chrome"
 version = "0.9.0"
-source = "git+https://github.com/atroche/rust-headless-chrome?rev=5f2311ad82#5f2311ad82cbc8627d476f56a07f6e2883c1c082"
+source = "git+https://github.com/iustin24/rust-headless-chrome#10110823cf317d22c50aa62fed575e4b068a8955"
 dependencies = [
  "anyhow",
  "auto_generate_cdp",
@@ -1806,6 +1807,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
+name = "openssl-src"
+version = "111.22.0+1.1.1q"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f31f0d509d1c1ae9cada2f9539ff8f37933831fd5098879e482aa687d659853"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1814,6 +1824,7 @@ dependencies = [
  "autocfg 1.1.0",
  "cc",
  "libc",
+ "openssl-src",
  "pkg-config",
  "vcpkg",
 ]
@@ -3392,7 +3403,7 @@ dependencies = [
 [[package]]
 name = "wappalyzer"
 version = "0.1.0"
-source = "git+https://github.com/iustin24/wappalyzer?#e2a8cd8f8e9bf1847a0340f1102220517f804103"
+source = "git+https://github.com/iustin24/wappalyzer?#b44f1d510d2b752a8b6822b70193a8629b7ebfda"
 dependencies = [
  "futures 0.3.24",
  "headless_chrome",

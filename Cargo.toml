@@ -22,4 +22,4 @@ feroxfuzz = "0.1.0-rc.0"
 itertools = "0.10.3"
 serde = "1.0.144"
 typetag = { version = "0.2.3" }
-openssl = { version = "0.10.40", features = ["vendored"] }
+openssl = { version = "0.10.41", features = ["vendored"]}
