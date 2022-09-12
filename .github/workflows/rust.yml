@@ -43,7 +43,7 @@ jobs:
           export OPENSSL_DIR=/usr/lib/ssl
           env
           sudo apt-get update
-          sudo apt-get install -y openssl libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu build-essential musl-dev musl-tools libssl-dev linux-libc-dev pkgconf zlib1g-dev
+          sudo apt-get install -y openssl libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu build-essential musl-dev musl-tools libssl-dev linux-libc-dev zlib1g-dev
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
