@@ -1,4 +1,4 @@
-name: CD Pipeline
+name: Build
 
 on: [push]
 
@@ -7,7 +7,6 @@ jobs:
     env:
       IN_PIPELINE: true
     runs-on: ${{ matrix.os }}
-    if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
         type: [ubuntu-x64, ubuntu-x86, armv7, aarch64]
@@ -42,7 +41,7 @@ jobs:
         run: |
           env
           sudo apt-get update
-          sudo apt-get install -y libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+          sudo apt-get install -y --no-install-recommends libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -51,7 +50,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         env:
           PKG_CONFIG_PATH: ${{ matrix.pkg_config_path }}
-          #OPENSSL_DIR: /usr/lib/ssl
+          OPENSSL_DIR: /usr/lib/ssl
         with:
           use-cross: true
           command: build
@@ -94,7 +93,6 @@ jobs:
     env:
       IN_PIPELINE: true
     runs-on: macos-latest
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -121,3 +119,39 @@ jobs:
         with:
           name: x86_64-macos-chameleon.tar.gz
           path: x86_64-macos-chameleon.tar.gz
+
+  build-windows:
+    env:
+      IN_PIPELINE: true
+    runs-on: ${{ matrix.os }}
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        type: [windows-x64, windows-x86]
+        include:
+          - type: windows-x64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: x86_64-windows-chameleon.exe
+            path: target\x86_64-pc-windows-msvc\release\chameleon.exe
+          - type: windows-x86
+            os: windows-latest
+            target: i686-pc-windows-msvc
+            name: x86-windows-chameleon.exe
+            path: target\i686-pc-windows-msvc\release\chameleon.exe
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ matrix.target }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.path }}
