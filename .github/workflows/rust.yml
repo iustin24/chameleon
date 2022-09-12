@@ -14,26 +14,26 @@ jobs:
           - type: ubuntu-x64
             os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            name: x86_64-linux-feroxbuster
-            path: target/x86_64-unknown-linux-musl/release/feroxbuster
+            name: x86_64-linux-chameleon
+            path: target/x86_64-unknown-linux-musl/release/chameleon
             pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
           - type: ubuntu-x86
             os: ubuntu-latest
             target: i686-unknown-linux-musl
-            name: x86-linux-feroxbuster
-            path: target/i686-unknown-linux-musl/release/feroxbuster
+            name: x86-linux-chameleon
+            path: target/i686-unknown-linux-musl/release/chameleon
             pkg_config_path: /usr/lib/i686-linux-gnu/pkgconfig
           - type: armv7
             os: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
-            name: armv7-feroxbuster
-            path: target/armv7-unknown-linux-gnueabihf/release/feroxbuster
+            name: armv7-chameleon
+            path: target/armv7-unknown-linux-gnueabihf/release/chameleon
             pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
           - type: aarch64
             os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            name: aarch64-feroxbuster
-            path: target/aarch64-unknown-linux-gnu/release/feroxbuster
+            name: aarch64-chameleon
+            path: target/aarch64-unknown-linux-gnu/release/chameleon
             pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
     steps:
       - uses: actions/checkout@v2
@@ -61,7 +61,7 @@ jobs:
       - name: Build tar.gz for homebrew installs
         if: matrix.type == 'ubuntu-x64'
         run: |
-          tar czf ${{ matrix.name }}.tar.gz -C target/x86_64-unknown-linux-musl/release feroxbuster
+          tar czf ${{ matrix.name }}.tar.gz -C target/x86_64-unknown-linux-musl/release chameleon
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.name }}
@@ -86,7 +86,7 @@ jobs:
   #     - name: Upload Deb Artifact
   #       uses: actions/upload-artifact@v2
   #       with:
-  #         name: feroxbuster_amd64.deb
+  #         name: chameleon_amd64.deb
   #         path: ./target/x86_64-unknown-linux-musl/debian/*
 
   build-macos:
@@ -107,18 +107,18 @@ jobs:
           args: --release --target=x86_64-apple-darwin
       - name: Strip symbols from binary
         run: |
-          strip -u -r target/x86_64-apple-darwin/release/feroxbuster
+          strip -u -r target/x86_64-apple-darwin/release/chameleon
       - name: Build tar.gz for homebrew installs
         run: |
-          tar czf x86_64-macos-feroxbuster.tar.gz -C target/x86_64-apple-darwin/release feroxbuster
+          tar czf x86_64-macos-chameleon.tar.gz -C target/x86_64-apple-darwin/release chameleon
       - uses: actions/upload-artifact@v2
         with:
-          name: x86_64-macos-feroxbuster
-          path: target/x86_64-apple-darwin/release/feroxbuster
+          name: x86_64-macos-chameleon
+          path: target/x86_64-apple-darwin/release/chameleon
       - uses: actions/upload-artifact@v2
         with:
-          name: x86_64-macos-feroxbuster.tar.gz
-          path: x86_64-macos-feroxbuster.tar.gz
+          name: x86_64-macos-chameleon.tar.gz
+          path: x86_64-macos-chameleon.tar.gz
 
   build-windows:
     env:
@@ -132,13 +132,13 @@ jobs:
           - type: windows-x64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            name: x86_64-windows-feroxbuster.exe
-            path: target\x86_64-pc-windows-msvc\release\feroxbuster.exe
+            name: x86_64-windows-chameleon.exe
+            path: target\x86_64-pc-windows-msvc\release\chameleon.exe
           - type: windows-x86
             os: windows-latest
             target: i686-pc-windows-msvc
-            name: x86-windows-feroxbuster.exe
-            path: target\i686-pc-windows-msvc\release\feroxbuster.exe
+            name: x86-windows-chameleon.exe
+            path: target\i686-pc-windows-msvc\release\chameleon.exe
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
