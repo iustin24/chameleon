@@ -42,7 +42,7 @@ jobs:
         run: |
           env
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pkg-config libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+          sudo apt-get install -y libssl-dev pkg-config gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -51,7 +51,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         env:
           PKG_CONFIG_PATH: ${{ matrix.pkg_config_path }}
-          OPENSSL_DIR: /usr/lib/ssl
+          #OPENSSL_DIR: /usr/lib/ssl
         with:
           use-cross: true
           command: build
@@ -72,6 +72,23 @@ jobs:
         with:
           name: ${{ matrix.name }}.tar.gz
           path: ${{ matrix.name }}.tar.gz
+
+  # build-deb:
+  #   needs: [build-nix]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - name: Install cargo-deb
+  #       run: cargo install -f cargo-deb
+  #     - name: Install musl toolchain
+  #       run: rustup target add x86_64-unknown-linux-musl
+  #     - name: Deb Build
+  #       run: cargo deb --target=x86_64-unknown-linux-musl
+  #     - name: Upload Deb Artifact
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: chameleon_amd64.deb
+  #         path: ./target/x86_64-unknown-linux-musl/debian/*
 
   build-macos:
     env:
@@ -101,3 +118,6 @@ jobs:
           name: x86_64-macos-chameleon
           path: target/x86_64-apple-darwin/release/chameleon
       - uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-macos-chameleon.tar.gz
+          path: x86_64-macos-chameleon.tar.gz
