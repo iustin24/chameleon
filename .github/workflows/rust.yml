@@ -89,3 +89,6 @@ jobs:
           name: x86_64-macos-chameleon
           path: target/x86_64-apple-darwin/release/chameleon
       - uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-macos-chameleon.tar.gz
+          path: x86_64-macos-chameleon.tar.gz
