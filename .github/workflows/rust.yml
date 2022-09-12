@@ -10,7 +10,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
-        type: [ubuntu-x64, ubuntu-x86, armv7, aarch64]
+        type: [ubuntu-x64, ubuntu-x86]
         include:
           - type: ubuntu-x64
             os: ubuntu-latest
@@ -24,18 +24,6 @@ jobs:
             name: x86-linux-chameleon
             path: target/i686-unknown-linux-musl/release/chameleon
             pkg_config_path: /usr/lib/i686-linux-gnu/pkgconfig
-          - type: armv7
-            os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            name: armv7-chameleon
-            path: target/armv7-unknown-linux-gnueabihf/release/chameleon
-            pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
-          - type: aarch64
-            os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            name: aarch64-chameleon
-            path: target/aarch64-unknown-linux-gnu/release/chameleon
-            pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
     steps:
       - uses: actions/checkout@v2
       - name: Install System Dependencies
