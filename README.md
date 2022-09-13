@@ -9,16 +9,11 @@ https://youst.in/posts/context-aware-conent-discovery-with-chameleon/
 
 ## Installation
 
-### Step 1:
-
-Visit https://rustup.rs/ and follow the instructions to get started with rust and cargo.
-
-### Step 2: 
-
+### Linux 64-bit and MacOS
 ```
-> cargo install --git https://github.com/iustin24/chameleon
+curl -sL https://raw.githubusercontent.com/iustin24/chameleon/master/install.sh | bash
 ```
-Installing the crate will create the directory `~/.config/chameleon/` and download the config file and custom wordlists.
+Running the script will create the directory `~/.config/chameleon/` and download the config file and custom wordlists.
 
 
 ## Example Usage:
