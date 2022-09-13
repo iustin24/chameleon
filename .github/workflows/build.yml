@@ -9,19 +9,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        type: [ubuntu-x64, armv7, aarch64]
+        type: [ubuntu-x64, aarch64]
         include:
           - type: ubuntu-x64
             os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             name: x86_64-linux-chameleon
             path: target/x86_64-unknown-linux-musl/release/chameleon
-            pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
-          - type: armv7
-            os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            name: armv7-chameleon
-            path: target/armv7-unknown-linux-gnueabihf/release/chameleon
             pkg_config_path: /usr/lib/x86_64-linux-gnu/pkgconfig
           - type: aarch64
             os: ubuntu-latest
