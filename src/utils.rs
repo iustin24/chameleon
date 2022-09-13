@@ -144,7 +144,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             //println!("{state:#}");
             eprintln!("Total time elapsed: {}ms\n", now.elapsed().as_millis());
         }
-        Err(e) => println!("{}\n", e),
+        Err(e) => println!("{}", e),
     }
 }
 
