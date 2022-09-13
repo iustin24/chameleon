@@ -150,6 +150,7 @@ impl Args {
             .connect_timeout(Duration::from_secs(5))
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
+            //.proxy(reqwest::Proxy::http("http://127.0.0.1:8080").unwrap())
             .timeout(Duration::from_secs(5))
             .user_agent(&self.useragent);
         client_builder.build().unwrap()
