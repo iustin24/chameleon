@@ -7,6 +7,7 @@ use clap::Parser;
 use colored::Colorize;
 use std::fs::read_to_string;
 use wappalyzer::wapp::Tech;
+use std::collections::HashSet;
 
 #[tokio::main]
 async fn main() {
@@ -42,7 +43,7 @@ async fn main() {
         };
 
         // Detect Technologies running on the host
-        let mut tech: Vec<Tech> = vec![];
+        let mut tech: HashSet<Tech> = HashSet::new();
         if args.tech_detect {
             match utils::tech_detect(tech_url.as_str()).await.result {
                 Ok(t) => tech = t,
@@ -60,7 +61,7 @@ async fn main() {
                             return None;
                         }
                     }
-                    tech.push(Tech {
+                    tech.insert(Tech {
                         name: String::from(t),
                         category: String::from(""),
                     });
@@ -112,5 +113,6 @@ async fn main() {
             &url,
         )
         .await;
+        main_wordlist = args.get_main_wordlist_str(&settings).unwrap();
     }
 }
