@@ -47,7 +47,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             )
             .unwrap();
 
-            let bar_inc = RequestProcessor::new(|request, _action, _state| {
+            let bar_inc = RequestProcessor::new(|_request, _action, _state| {
                 bar.inc(1);
             });
             let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
@@ -67,28 +67,28 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                 });
 
             let match_decider = FilterDecider::new(args, |args, code, length, _state| {
-                match match &args.matchcode {
-                    Some(mc) => filter(mc, &code, true),
-                    _ => Action::Keep,
-                } {
+                match filter(&args.matchcode, &code, true) {
                     Action::Keep => match &args.matchsize {
-                        Some(ms) => filter(ms, &length, true),
+                        Some(fs) => filter(fs, &length, true),
                         _ => Action::Keep,
                     },
-                    Action::Discard => Action::Discard,
                     _ => Action::Discard,
                 }
             });
 
             let filter_decider =
                 FilterDecider::new(args, |args, code, length, _state| {
-                    match filter(&args.filtercode, &code, false) {
-                        Action::Keep => match &args.filtersize {
-                            Some(fs) => filter(fs, &length, false),
-                            _ => Action::Keep,
-                        },
-                        _ => Action::Discard,
-                    }
+                    match match &args.filtercode {
+                    Some(mc) => filter(mc, &code, false),
+                    _ => Action::Keep,
+                } {
+                    Action::Keep => match &args.filtersize {
+                        Some(ms) => filter(ms, &length, false),
+                        _ => Action::Keep,
+                    },
+                    Action::Discard => Action::Discard,
+                    _ => Action::Discard,
+                }
                 });
 
             let response_printer = ResponseProcessor::new(

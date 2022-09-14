@@ -79,7 +79,7 @@ pub struct Args {
     #[clap(
         short = 'i',
         long = "include tech",
-        help = "Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )"
+        help = "Technology to be included, even if its not detected by wappalyzer. ( -i PHP,IIS )"
     )]
     pub(crate) techs: Option<String>,
 
@@ -99,10 +99,9 @@ pub struct Args {
         help = "Filter HTTP status codes from response - Comma separated list",
         multiple = true,
         use_value_delimiter = true,
-        value_delimiter = ',',
-        default_value = "404"
+        value_delimiter = ','
     )]
-    pub(crate) filtercode: Vec<u16>,
+    pub(crate) filtercode: Option<Vec<u16>>,
 
     #[clap(
         short = 's',
@@ -120,9 +119,10 @@ pub struct Args {
         help = "Match HTTP status codes from response - Comma separated list",
         multiple = true,
         use_value_delimiter = true,
-        value_delimiter = ','
+        value_delimiter = ',',
+        default_value = "200,204,301,302,307,401,403,405"
     )]
-    pub(crate) matchcode: Option<Vec<u16>>,
+    pub(crate) matchcode: Vec<u16>,
 
     #[clap(
         short = 'U',
