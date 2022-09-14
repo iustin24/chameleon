@@ -5,9 +5,9 @@ extern crate dirs;
 use crate::args::Args;
 use clap::Parser;
 use colored::Colorize;
+use std::collections::HashSet;
 use std::fs::read_to_string;
 use wappalyzer::wapp::Tech;
-use std::collections::HashSet;
 
 #[tokio::main]
 async fn main() {

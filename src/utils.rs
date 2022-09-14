@@ -10,7 +10,7 @@ use feroxfuzz::fuzzers::AsyncFuzzer;
 use feroxfuzz::mutators::ReplaceKeyword;
 use feroxfuzz::observers::ResponseObserver;
 use feroxfuzz::prelude::*;
-use feroxfuzz::processors::ResponseProcessor;
+use feroxfuzz::processors::{RequestProcessor, ResponseProcessor};
 use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
 use feroxfuzz::schedulers::OrderedScheduler;
@@ -47,6 +47,9 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             )
             .unwrap();
 
+            let bar_inc = RequestProcessor::new(|request, _action, _state| {
+                bar.inc(1);
+            });
             let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
             let auto = calibrate_results(&args, url).await;
             let calibrate_decider =
@@ -90,7 +93,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
 
             let response_printer = ResponseProcessor::new(
                 |response_observer: &ResponseObserver<AsyncResponse>, action, _state| {
-                    bar.inc(1);
+                    //bar.inc(1);
                     if let Some(Action::Keep) = action {
                         bar.println(format!(
                             "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
@@ -122,7 +125,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             let deciders = build_deciders!(calibrate_decider, match_decider, filter_decider);
             let mutators = build_mutators!(mutator);
             let observers = build_observers!(response_observer);
-            let processors = build_processors!(response_printer);
+            let processors = build_processors!(response_printer, bar_inc);
 
             let threads = args.concurrency;
 
