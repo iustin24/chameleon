@@ -9,7 +9,7 @@ resolver = "1"
 [dependencies]
 
 openssl = { version = "0.10.40", features = ["vendored"] }
-wappalyzer = { path = "../wappalyzer" }
+wappalyzer = { git = "https://github.com/iustin24/wappalyzer" }
 config = "0.13.1"
 reqwest = { version = "0.11.11" }
 tokio = { version = "1.21.0", features = ["macros", "rt-multi-thread"] }
