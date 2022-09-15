@@ -14,7 +14,7 @@ use feroxfuzz::processors::{RequestProcessor, ResponseProcessor};
 use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
 use feroxfuzz::schedulers::OrderedScheduler;
-use indicatif::{MultiProgress, ProgressBar, ProgressDrawTarget};
+use indicatif::{ProgressBar};
 use std::collections::HashSet;
 use std::time::Instant;
 use url::Url;
