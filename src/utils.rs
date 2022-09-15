@@ -14,7 +14,7 @@ use feroxfuzz::processors::{RequestProcessor, ResponseProcessor};
 use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
 use feroxfuzz::schedulers::OrderedScheduler;
-use indicatif::ProgressBar;
+use indicatif::{MultiProgress, ProgressBar, ProgressDrawTarget};
 use std::collections::HashSet;
 use std::time::Instant;
 use url::Url;
@@ -28,6 +28,8 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
 
 pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let bar = ProgressBar::new(paths.len() as u64);
+
+    //let bar = ProgressBar::add_bar("", 0, BarType::Hidden);
     let words = Wordlist::with_words(paths).name("words").build();
     let mut state = SharedState::with_corpus(words);
     let now = Instant::now();
