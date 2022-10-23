@@ -38,23 +38,27 @@ OPTIONS:
     -A, --auto-calibrate
             Automatically calibrate filtering options (default: false)
 
-    -c, --config <CONFIG>
-            Config file to use [default: ~/.config/chameleon/config.toml]
+    -c, --mc <MATCHCODE>...
+            Match HTTP status codes from response - Comma separated list [default:
+            200,204,301,302,307,401,403,405]
 
     -C, --fc <FILTERCODE>...
-            Filter HTTP status codes from response - Comma separated list [default: 404]
+            Filter HTTP status codes from response - Comma separated list
 
     -h, --help
             Print help information
 
     -i, --include tech <TECHS>
-            Technology to be included, even if its not detected by wappalyzer. ( -i PHP,ISS )
+            Technology to be included, even if its not detected by wappalyzer. ( -i PHP,IIS )
+
+    -k, --config <CONFIG>
+            Config file to use [default: ~/.config/chameleon/config.toml]
 
     -L, --hosts-file <HOSTS_FILE>
             List of hosts to scan
 
-    -M, --mc <MATCHCODE>...
-            Match HTTP status codes from response - Comma separated list
+    -o, --output <OUTPUT>
+            Save the output into a file
 
     -s, --ms <MATCHSIZE>...
             Match HTTP response size. Comma separated list of sizes
@@ -84,6 +88,7 @@ OPTIONS:
 
     -W, --small-wordlist <SMALL_WORDLIST>
             Wordlist used to generate files by adding extensions ( FUZZ.%ext )
+
 ```
 
 ## Config file
