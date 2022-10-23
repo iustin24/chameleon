@@ -51,6 +51,9 @@ OPTIONS:
     -i, --include tech <TECHS>
             Technology to be included, even if its not detected by wappalyzer. ( -i PHP,IIS )
 
+    -J, --json
+            Save the output as json
+
     -k, --config <CONFIG>
             Config file to use [default: ~/.config/chameleon/config.toml]
 
@@ -67,7 +70,7 @@ OPTIONS:
             Filter HTTP response size. Comma separated list of sizes
 
     -t, --concurrency <CONCURRENCY>
-            Number of concurrent threads ( default: 200 ) [default: 200]
+            Number of concurrent threads ( default: 200 ) [default: 40]
 
     -T, --tech url <TECH_URL>
             URL which will be scanned for technologies. By default, this is the same as '-u',
