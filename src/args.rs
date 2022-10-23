@@ -65,7 +65,7 @@ pub struct Args {
         short = 't',
         long = "concurrency",
         help = "Number of concurrent threads ( default: 200 )",
-        default_value = "200"
+        default_value = "40"
     )]
     pub(crate) concurrency: usize,
 
