@@ -14,11 +14,14 @@ use feroxfuzz::processors::{RequestProcessor, ResponseProcessor};
 use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
 use feroxfuzz::schedulers::OrderedScheduler;
-use indicatif::{ProgressBar};
+use indicatif::ProgressBar;
 use std::collections::HashSet;
 use std::time::Instant;
 use url::Url;
 use wappalyzer::Analysis;
+use std::fs::File;
+use std::io::Write;
+use std::sync::{Arc, Mutex};
 
 pub(crate) async fn tech_detect(url: &str) -> Analysis {
     eprintln!("{}", format!("Started scanning {}\n", url).bold().green());
@@ -33,8 +36,15 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let words = Wordlist::with_words(paths).name("words").build();
     let mut state = SharedState::with_corpus(words);
     let now = Instant::now();
-
     let client = args.build_client();
+
+    let writer = Arc::new(Mutex::new(match &args.output {
+        Some(file) => {
+            File::create(file).ok()
+        }
+        None => None,
+    }));
+
     match client.get(url).send().await {
         Ok(_) => {
             eprintln!("Started bruteforcing {} with {:?} paths", url, bar.length());
@@ -68,19 +78,19 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                     }
                 });
 
-            let match_decider = FilterDecider::new(args, |args, code, length, _state| {
-                match filter(&args.matchcode, &code, true) {
-                    Action::Keep => match &args.matchsize {
-                        Some(fs) => filter(fs, &length, true),
-                        _ => Action::Keep,
-                    },
-                    _ => Action::Discard,
-                }
-            });
-
-            let filter_decider =
+            let match_decider =
                 FilterDecider::new(args, |args, code, length, _state| {
-                    match match &args.filtercode {
+                    match filter(&args.matchcode, &code, true) {
+                        Action::Keep => match &args.matchsize {
+                            Some(fs) => filter(fs, &length, true),
+                            _ => Action::Keep,
+                        },
+                        _ => Action::Discard,
+                    }
+                });
+
+            let filter_decider = FilterDecider::new(args, |args, code, length, _state| {
+                match match &args.filtercode {
                     Some(mc) => filter(mc, &code, false),
                     _ => Action::Keep,
                 } {
@@ -91,12 +101,42 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                     Action::Discard => Action::Discard,
                     _ => Action::Discard,
                 }
-                });
+            });
 
             let response_printer = ResponseProcessor::new(
                 |response_observer: &ResponseObserver<AsyncResponse>, action, _state| {
                     //bar.inc(1);
                     if let Some(Action::Keep) = action {
+                        if let Some( file) = writer.lock().unwrap().as_mut() {
+                            writeln!(
+                                file,
+                                "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
+                                match response_observer.status_code().to_string().chars().nth(0) {
+                                    Some('2') =>
+                                        format!("{}", &response_observer.status_code()).green(),
+                                    Some('3') =>
+                                        format!("{}", &response_observer.status_code()).blue(),
+                                    Some('4') =>
+                                        format!("{}", &response_observer.status_code()).yellow(),
+                                    Some('5') =>
+                                        format!("{}", &response_observer.status_code()).red(),
+                                    _ => format!("{}", &response_observer.status_code()).white(),
+                                },
+                                response_observer.content_length(),
+                                response_observer.url().as_str(),
+                                match (
+                                    response_observer.headers().get("location"),
+                                    response_observer.headers().get("Location")
+                                ) {
+                                    (Some(location), _) | (_, Some(location)) => format!(
+                                        "-> {}",
+                                        String::from_utf8_lossy(location).to_string()
+                                    ),
+                                    _ => String::from(""),
+                                }
+                            )
+                            .unwrap();
+                        }
                         bar.println(format!(
                             "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
                             match response_observer.status_code().to_string().chars().nth(0) {

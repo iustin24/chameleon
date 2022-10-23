@@ -131,6 +131,13 @@ pub struct Args {
         default_value = "Chameleon / https://github.com/iustin24/chameleon"
     )]
     pub(crate) useragent: String,
+
+    #[clap(
+    short = 'o',
+    long = "output",
+    help = "Save the output into a file",
+    )]
+    pub(crate) output: Option<String>,
 }
 
 impl Args {
