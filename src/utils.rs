@@ -15,13 +15,15 @@ use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
 use feroxfuzz::schedulers::OrderedScheduler;
 use indicatif::ProgressBar;
+use serde::{Serialize};
 use std::collections::HashSet;
+use std::fs::{ OpenOptions};
+use std::io::Write;
+use std::ops::DerefMut;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use url::Url;
 use wappalyzer::Analysis;
-use std::fs::File;
-use std::io::Write;
-use std::sync::{Arc, Mutex};
 
 pub(crate) async fn tech_detect(url: &str) -> Analysis {
     eprintln!("{}", format!("Started scanning {}\n", url).bold().green());
@@ -29,6 +31,18 @@ pub(crate) async fn tech_detect(url: &str) -> Analysis {
     wappalyzer::scan(url).await
 }
 
+#[derive(Serialize, Clone)]
+struct Result {
+    url: String,
+    status_code: u16,
+    content_length: usize,
+    location: String,
+}
+#[derive(Serialize)]
+struct JsonStruct {
+    host: String,
+    results: Vec<Result>,
+}
 pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let bar = ProgressBar::new(paths.len() as u64);
 
@@ -37,11 +51,13 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let mut state = SharedState::with_corpus(words);
     let now = Instant::now();
     let client = args.build_client();
-
+    let results: Arc<Mutex<Vec<Result>>> = Arc::new(Mutex::new(vec![])); // Used for JSON output
     let writer = Arc::new(Mutex::new(match &args.output {
-        Some(file) => {
-            File::create(file).ok()
-        }
+        Some(file) => OpenOptions::new().create(true)
+            .append(true)
+            .open(file)
+            .ok()
+        ,
         None => None,
     }));
 
@@ -106,9 +122,26 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             let response_printer = ResponseProcessor::new(
                 |response_observer: &ResponseObserver<AsyncResponse>, action, _state| {
                     //bar.inc(1);
+                    let location = match (
+                        response_observer.headers().get("location"),
+                        response_observer.headers().get("Location"),
+                    ) {
+                        (Some(location), _) | (_, Some(location)) => {
+                            String::from_utf8_lossy(location).to_string()
+                        }
+                        _ => String::from(""),
+                    };
                     if let Some(Action::Keep) = action {
-                        if let Some( file) = writer.lock().unwrap().as_mut() {
-                            writeln!(
+                        if let Some(file) = writer.lock().unwrap().as_mut() {
+                            if (&args).json {
+                                results.lock().unwrap().deref_mut().push(Result {
+                                    url: response_observer.url().to_string(),
+                                    status_code: response_observer.status_code(),
+                                    content_length: response_observer.content_length(),
+                                    location: location.clone(),
+                                });
+                            } else {
+                                writeln!(
                                 file,
                                 "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
                                 match response_observer.status_code().to_string().chars().nth(0) {
@@ -124,18 +157,10 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                                 },
                                 response_observer.content_length(),
                                 response_observer.url().as_str(),
-                                match (
-                                    response_observer.headers().get("location"),
-                                    response_observer.headers().get("Location")
-                                ) {
-                                    (Some(location), _) | (_, Some(location)) => format!(
-                                        "-> {}",
-                                        String::from_utf8_lossy(location).to_string()
-                                    ),
-                                    _ => String::from(""),
-                                }
+                                format!("-> {}", location)
                             )
                             .unwrap();
+                            }
                         }
                         bar.println(format!(
                             "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
@@ -150,14 +175,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                             },
                             response_observer.content_length(),
                             response_observer.url().as_str(),
-                            match (
-                                response_observer.headers().get("location"),
-                                response_observer.headers().get("Location")
-                            ) {
-                                (Some(location), _) | (_, Some(location)) =>
-                                    format!("-> {}", String::from_utf8_lossy(location).to_string()),
-                                _ => String::from(""),
-                            }
+                            format!("-> {}", location)
                         ));
                     }
                 },
@@ -185,7 +203,14 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
             fuzzer.set_post_send_logic(LogicOperation::And);
 
             fuzzer.fuzz_once(&mut state).await.unwrap();
-
+            if let Some(file) = writer.lock().unwrap().as_mut() {
+                let r = results.lock().unwrap().clone();
+                let data = JsonStruct {
+                    host: url.to_string(),
+                    results: r
+                };
+                writeln!(file, "{}", serde_json::to_string(&data).unwrap()).unwrap();
+            }
             //println!("{state:#}");
             eprintln!("Total time elapsed: {}ms\n", now.elapsed().as_millis());
         }

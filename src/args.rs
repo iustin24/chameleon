@@ -138,6 +138,15 @@ pub struct Args {
     help = "Save the output into a file",
     )]
     pub(crate) output: Option<String>,
+
+
+    #[clap(
+    short = 'J',
+    long = "json",
+    help = "Save the output as json",
+    takes_value = false
+    )]
+    pub(crate) json: bool,
 }
 
 impl Args {
