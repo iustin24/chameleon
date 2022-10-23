@@ -55,7 +55,6 @@ RoundCube="~/.config/chameleon/wordlists/RoundCube.txt"
 GlassFish="~/.config/chameleon/wordlists/GlassFish.txt"
 Lotus_Domino="~/.config/chameleon/wordlists/Lotus.txt"
 Oracle_Application_Server="~/.config/chameleon/wordlists/OracleAppServer.txt"
-Node_js="~/.config/chameleon/wordlists/Nodejs.txt"
 
 # Technology specific Extensions
 
