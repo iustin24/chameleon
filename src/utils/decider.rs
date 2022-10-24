@@ -4,58 +4,82 @@ use feroxfuzz::deciders::{Decider, DeciderHooks};
 use feroxfuzz::observers::{Observers, ResponseObserver};
 use feroxfuzz::responses::Response;
 use feroxfuzz::state::SharedState;
+use feroxfuzz::AsAny;
 use feroxfuzz::Metadata;
+use feroxfuzz::Named;
 use std::any::Any;
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "type", rename = "metadata-struct")]
 pub(crate) struct MetadataStruct {
     pub(crate) length: usize,
     pub(crate) words: usize,
     pub(crate) lines: usize,
 }
 
-#[typetag::serde(name = "metadata")]
-impl Metadata for MetadataStruct {
-    fn is_equal(&self, _other: &dyn Any) -> bool {
-        false
-    }
-    fn as_any(&self) -> &dyn std::any::Any {
+impl AsAny for MetadataStruct {
+    fn as_any(&self) -> &dyn Any {
         self
+    }
+}
+
+#[typetag::serde]
+impl Metadata for MetadataStruct {
+    fn is_equal(&self, other: &dyn Any) -> bool {
+        false
     }
 }
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct FilterDecider<'a, F>
-where
-    F: Fn(&'a Args, u16, usize, &SharedState) -> Action,
-{
-    comparator: F,
-    args: &'a Args,
-}
-
-impl<'a, F> FilterDecider<'a, F>
+pub struct FilterDecider<F>
 where
     F: Fn(&Args, u16, usize, &SharedState) -> Action,
 {
-    pub const fn new(args: &'a Args, comparator: F) -> Self {
+    comparator: F,
+    args: Args,
+}
+
+impl<F> FilterDecider<F>
+where
+    F: Fn(&Args, u16, usize, &SharedState) -> Action,
+{
+    pub const fn new(args: Args, comparator: F) -> Self {
         Self { comparator, args }
     }
 }
 
-impl<'a, O, R, F> DeciderHooks<O, R> for FilterDecider<'a, F>
+impl<F> AsAny for FilterDecider<F>
+where
+    F: Fn(&Args, u16, usize, &SharedState) -> Action + 'static,
+{
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl<F> Named for FilterDecider<F>
+where
+    F: Fn(&Args, u16, usize, &SharedState) -> Action,
+{
+    fn name(&self) -> &'static str {
+        "FilterDecider"
+    }
+}
+
+impl<O, R, F> DeciderHooks<O, R> for FilterDecider<F>
 where
     O: Observers<R>,
-    R: Response,
-    F: Fn(&'a Args, u16, usize, &SharedState) -> Action,
+    R: Response + Sync + Send + Clone,
+    F: Fn(&Args, u16, usize, &SharedState) -> Action + Sync + Send + Clone + 'static,
 {
 }
 
-impl<'a, O, R, F> Decider<O, R> for FilterDecider<'a, F>
+impl<O, R, F> Decider<O, R> for FilterDecider<F>
 where
     O: Observers<R>,
-    R: Response,
-    F: Fn(&'a Args, u16, usize, &SharedState) -> Action,
+    R: Response + Sync + Send + Clone,
+    F: Fn(&Args, u16, usize, &SharedState) -> Action + Sync + Send + Clone + 'static,
 {
     fn decide_with_observers(&mut self, state: &SharedState, observers: &O) -> Option<Action> {
         if let Some(observer) = observers.match_name::<ResponseObserver<R>>("ResponseObserver") {
@@ -81,6 +105,24 @@ where
     metadata: &'a Vec<MetadataStruct>,
 }
 
+impl<'a, F> Named for CalibrateDecider<'a, F>
+where
+    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action,
+{
+    fn name(&self) -> &'static str {
+        "CalibrateDecider"
+    }
+}
+
+impl<'a, F> AsAny for CalibrateDecider<'a, F>
+where
+    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action + 'static,
+{
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
 impl<'a, F> CalibrateDecider<'a, F>
 where
     F: Fn(&Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action,
@@ -96,16 +138,24 @@ where
 impl<'a, O, R, F> DeciderHooks<O, R> for CalibrateDecider<'a, F>
 where
     O: Observers<R>,
-    R: Response,
-    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action,
+    R: Response + Sync + Send + Clone,
+    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action
+        + Sync
+        + Send
+        + Clone
+        + 'static,
 {
 }
 
 impl<'a, O, R, F> Decider<O, R> for CalibrateDecider<'a, F>
 where
     O: Observers<R>,
-    R: Response,
-    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action,
+    R: Response + Sync + Send + Clone,
+    F: Fn(&'a Vec<MetadataStruct>, usize, usize, usize, &SharedState) -> Action
+        + Sync
+        + Send
+        + Clone
+        + 'static,
 {
     fn decide_with_observers(&mut self, state: &SharedState, observers: &O) -> Option<Action> {
         if let Some(observer) = observers.match_name::<ResponseObserver<R>>("ResponseObserver") {

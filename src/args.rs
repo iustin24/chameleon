@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::time::Duration;
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[clap(author, version, about)]
 pub struct Args {
     #[clap(
@@ -132,19 +132,14 @@ pub struct Args {
     )]
     pub(crate) useragent: String,
 
-    #[clap(
-    short = 'o',
-    long = "output",
-    help = "Save the output into a file",
-    )]
+    #[clap(short = 'o', long = "output", help = "Save the output into a file")]
     pub(crate) output: Option<String>,
 
-
     #[clap(
-    short = 'J',
-    long = "json",
-    help = "Save the output as json",
-    takes_value = false
+        short = 'J',
+        long = "json",
+        help = "Save the output as json",
+        takes_value = false
     )]
     pub(crate) json: bool,
 }
