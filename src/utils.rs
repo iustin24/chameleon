@@ -4,7 +4,7 @@ use crate::utils::decider::{CalibrateDecider, FilterDecider, MetadataStruct};
 use crate::Args;
 use colored::Colorize;
 use feroxfuzz::client::AsyncClient;
-use feroxfuzz::corpora::Wordlist;
+use feroxfuzz::corpora::{HttpMethodsCorpus, Wordlist};
 use feroxfuzz::deciders::LogicOperation;
 use feroxfuzz::fuzzers::AsyncFuzzer;
 use feroxfuzz::mutators::ReplaceKeyword;
@@ -47,8 +47,12 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
     let bar = ProgressBar::new(paths.len() as u64);
 
     //let bar = ProgressBar::add_bar("", 0, BarType::Hidden);
+
     let words = Wordlist::with_words(paths).name("words").build();
-    let mut state = SharedState::with_corpus(words);
+    let state = SharedState::with_corpus(words);
+    //let methods = HttpMethodsCorpus::new().method("GET");
+    //.method("GET").name("methods");
+    //let mut state = SharedState::with_corpora([words,methods]);
     let now = Instant::now();
     let client = args.build_client();
     let results: Arc<Mutex<Vec<Result>>> = Arc::new(Mutex::new(vec![])); // Used for JSON output
@@ -277,7 +281,6 @@ pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<Metadata
         )]),
     )
     .unwrap();
-
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
     let response_printer = ResponseProcessor::new(
