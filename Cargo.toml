@@ -22,7 +22,7 @@ colored = "2.0.0"
 clap = { version = "3", features = ["derive"]}
 anyhow = "1.0.57"
 dirs = "4.0.0"
-feroxfuzz = { git = "https://github.com/epi052/feroxfuzz" }
+feroxfuzz = { git = "https://github.com/iustin24/feroxfuzz", branch = "master"}
 itertools = "0.10.3"
 serde = "1.0.144"
 typetag = { version = "0.2.3" }

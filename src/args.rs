@@ -132,21 +132,27 @@ pub struct Args {
     )]
     pub(crate) useragent: String,
 
-    #[clap(
-    short = 'o',
-    long = "output",
-    help = "Save the output into a file",
-    )]
+    #[clap(short = 'o', long = "output", help = "Save the output into a file")]
     pub(crate) output: Option<String>,
 
-
     #[clap(
-    short = 'J',
-    long = "json",
-    help = "Save the output as json",
-    takes_value = false
+        short = 'J',
+        long = "json",
+        help = "Save the output as json",
+        takes_value = false
     )]
     pub(crate) json: bool,
+
+    #[clap(
+        short = 'X',
+        long = "methods",
+        help = "HTTP Methods to use. Comma separated list of sizes",
+        default_value = "GET",
+        multiple = true,
+        use_value_delimiter = true,
+        value_delimiter = ','
+    )]
+    pub(crate) methods: Vec<String>,
 }
 
 impl Args {
@@ -166,7 +172,7 @@ impl Args {
             .connect_timeout(Duration::from_secs(5))
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
-            //.proxy(reqwest::Proxy::http("http://127.0.0.1:8080").unwrap())
+            //.proxy(reqwest::Proxy::https("http://127.0.0.1:8080").unwrap())
             .timeout(Duration::from_secs(5))
             .user_agent(&self.useragent);
         client_builder.build().unwrap()

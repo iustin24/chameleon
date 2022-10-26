@@ -13,11 +13,11 @@ use feroxfuzz::prelude::*;
 use feroxfuzz::processors::{RequestProcessor, ResponseProcessor};
 use feroxfuzz::responses::AsyncResponse;
 use feroxfuzz::responses::Response;
-use feroxfuzz::schedulers::OrderedScheduler;
+use feroxfuzz::schedulers::ProductScheduler;
 use indicatif::ProgressBar;
-use serde::{Serialize};
+use serde::Serialize;
 use std::collections::HashSet;
-use std::fs::{ OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::ops::DerefMut;
 use std::sync::{Arc, Mutex};
@@ -44,38 +44,40 @@ struct JsonStruct {
     results: Vec<Result>,
 }
 pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
-    let bar = ProgressBar::new(paths.len() as u64);
+    let bar = ProgressBar::new(paths.len() as u64 * args.methods.len() as u64);
 
     //let bar = ProgressBar::add_bar("", 0, BarType::Hidden);
-
     let words = Wordlist::with_words(paths).name("words").build();
-    let state = SharedState::with_corpus(words);
-    //let methods = HttpMethodsCorpus::new().method("GET");
-    //.method("GET").name("methods");
-    //let mut state = SharedState::with_corpora([words,methods]);
+    let methods = HttpMethodsCorpus::with_methods(args.methods.clone())
+        .name("methods")
+        .build();
+    let mut state = SharedState::with_corpora([words, methods]);
     let now = Instant::now();
     let client = args.build_client();
     let results: Arc<Mutex<Vec<Result>>> = Arc::new(Mutex::new(vec![])); // Used for JSON output
     let writer = Arc::new(Mutex::new(match &args.output {
-        Some(file) => OpenOptions::new().create(true)
-            .append(true)
-            .open(file)
-            .ok()
-        ,
+        Some(file) => OpenOptions::new().create(true).append(true).open(file).ok(),
         None => None,
     }));
 
     match client.get(url).send().await {
         Ok(_) => {
-            eprintln!("Started bruteforcing {} with {:?} paths", url, bar.length());
+            eprintln!(
+                "Started bruteforcing {} with {:?} paths using {:?}",
+                url,
+                bar.length(),
+                &args.methods
+            );
             let async_client = AsyncClient::with_client(client);
             let mutator = ReplaceKeyword::new(&"FUZZ", "words");
+            let mutator2 = ReplaceKeyword::new(&"METHOD", "methods");
             let parse = Url::parse(url).expect("Invalid URL");
             let request = Request::from_url(
                 url,
-                Some(&[ShouldFuzz::URLPath(
-                    format!("{}FUZZ", parse.path()).as_ref(),
-                )]),
+                Some(&[
+                    ShouldFuzz::URLPath(format!("{}FUZZ", parse.path()).as_ref()),
+                    ShouldFuzz::HTTPMethod(b"METHOD"),
+                ]),
             )
             .unwrap();
 
@@ -83,19 +85,21 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                 bar.inc(1);
             });
             let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
-            let auto = calibrate_results(&args, url).await;
+            let auto = if args.auto_calibrate {
+                calibrate_results(&args, url).await
+            } else {
+                vec![]
+            };
             let calibrate_decider =
-                CalibrateDecider::new(&auto, |auto, length, words, lines, _state| {
-                    if args.auto_calibrate {
-                        for i in auto {
-                            if i.lines == lines || i.words == words || i.length == length {
-                                return Action::Discard;
-                            }
+                CalibrateDecider::new(&auto, |auto, method, length, words, lines, _state| {
+                    for i in auto {
+                        if (i.lines == lines || i.words == words || i.length == length)
+                            && i.method == method
+                        {
+                            return Action::Discard;
                         }
-                        Action::Keep
-                    } else {
-                        Action::Keep
                     }
+                    Action::Keep
                 });
 
             let match_decider =
@@ -146,24 +150,24 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                                 });
                             } else {
                                 writeln!(
-                                file,
-                                "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
-                                match response_observer.status_code().to_string().chars().nth(0) {
-                                    Some('2') =>
-                                        format!("{}", &response_observer.status_code()).green(),
-                                    Some('3') =>
-                                        format!("{}", &response_observer.status_code()).blue(),
-                                    Some('4') =>
-                                        format!("{}", &response_observer.status_code()).yellow(),
-                                    Some('5') =>
-                                        format!("{}", &response_observer.status_code()).red(),
-                                    _ => format!("{}", &response_observer.status_code()).white(),
-                                },
-                                response_observer.content_length(),
-                                response_observer.url().as_str(),
-                                format!("-> {}", location)
-                            )
-                            .unwrap();
+                                    file,
+                                    "{0: <4} - {1: >7}B - {2: <0} {3: <0}",
+                                    match response_observer.status_code().to_string().chars().nth(0) {
+                                        Some('2') =>
+                                            format!("{}", &response_observer.status_code()).green(),
+                                        Some('3') =>
+                                            format!("{}", &response_observer.status_code()).blue(),
+                                        Some('4') =>
+                                            format!("{}", &response_observer.status_code()).yellow(),
+                                        Some('5') =>
+                                            format!("{}", &response_observer.status_code()).red(),
+                                        _ => format!("{}", &response_observer.status_code()).white(),
+                                    },
+                                    response_observer.content_length(),
+                                    response_observer.url().as_str(),
+                                    format!("{}{}", if location.is_empty() { "" } else { "->"}, location)
+                                )
+                                    .unwrap();
                             }
                         }
                         bar.println(format!(
@@ -179,15 +183,20 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                             },
                             response_observer.content_length(),
                             response_observer.url().as_str(),
-                            format!("-> {}", location)
+                            format!(
+                                "{}{}",
+                                if location.is_empty() { "" } else { "->" },
+                                location
+                            )
                         ));
                     }
                 },
             );
 
-            let scheduler = OrderedScheduler::new(state.clone()).unwrap();
+            let order = ["methods", "words"];
+            let scheduler = ProductScheduler::new(order, state.clone()).unwrap();
             let deciders = build_deciders!(calibrate_decider, match_decider, filter_decider);
-            let mutators = build_mutators!(mutator);
+            let mutators = build_mutators!(mutator, mutator2);
             let observers = build_observers!(response_observer);
             let processors = build_processors!(response_printer, bar_inc);
 
@@ -211,7 +220,7 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                 let r = results.lock().unwrap().clone();
                 let data = JsonStruct {
                     host: url.to_string(),
-                    results: r
+                    results: r,
                 };
                 writeln!(file, "{}", serde_json::to_string(&data).unwrap()).unwrap();
             }
@@ -267,20 +276,27 @@ pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<Metadata
     let words = Wordlist::with_words([".htacessxxx", "adminxxx", "chameleonxxx"])
         .name("words")
         .build();
-    let mut state = SharedState::with_corpus(words);
+
+    let methods = HttpMethodsCorpus::with_methods(args.methods.clone())
+        .name("methods")
+        .build();
+    let mut state = SharedState::with_corpora([words, methods]);
+
+    let mutator = ReplaceKeyword::new(&"FUZZ", "words");
+    let mutator2 = ReplaceKeyword::new(&"METHOD", "methods");
+    let parse = Url::parse(url).expect("Invalid URL");
+    let request = Request::from_url(
+        url,
+        Some(&[
+            ShouldFuzz::URLPath(format!("{}FUZZ", parse.path()).as_ref()),
+            ShouldFuzz::HTTPMethod(b"METHOD"),
+        ]),
+    )
+    .unwrap();
 
     let client = args.build_client();
     let async_client = AsyncClient::with_client(client);
 
-    let mutator = ReplaceKeyword::new(&"FUZZ", "words");
-    let parse = Url::parse(url).expect("Invalid URL");
-    let request = Request::from_url(
-        url,
-        Some(&[ShouldFuzz::URLPath(
-            format!("{}FUZZ", parse.path()).as_ref(),
-        )]),
-    )
-    .unwrap();
     let response_observer: ResponseObserver<AsyncResponse> = ResponseObserver::new();
 
     let response_printer = ResponseProcessor::new(
@@ -288,6 +304,7 @@ pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<Metadata
             state.add_metadata(
                 response_observer.url().path(),
                 MetadataStruct {
+                    method: response_observer.method().to_string(),
                     length: response_observer.content_length(),
                     words: response_observer.word_count(),
                     lines: response_observer.line_count(),
@@ -296,9 +313,11 @@ pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<Metadata
         },
     );
 
-    let scheduler = OrderedScheduler::new(state.clone()).unwrap();
+    let order = ["methods", "words"];
+    let scheduler = ProductScheduler::new(order, state.clone()).unwrap();
+
     let deciders = build_deciders!();
-    let mutators = build_mutators!(mutator);
+    let mutators = build_mutators!(mutator, mutator2);
     let observers = build_observers!(response_observer);
     let processors = build_processors!(response_printer);
 
