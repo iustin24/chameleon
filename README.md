@@ -92,6 +92,9 @@ OPTIONS:
     -W, --small-wordlist <SMALL_WORDLIST>
             Wordlist used to generate files by adding extensions ( FUZZ.%ext )
 
+    -X, --methods <METHODS>...
+            HTTP Methods to use. Comma separated list of sizes [default: GET]
+
 ```
 
 ## Config file
