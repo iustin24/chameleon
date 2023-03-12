@@ -6,6 +6,29 @@ use reqwest::{Client as http, Client};
 use std::collections::HashMap;
 use std::fs::read_to_string;
 use std::time::Duration;
+use std::str::FromStr;
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum StatusCodes {
+    All,
+    Codes(Vec<u16>),
+}
+
+impl FromStr for StatusCodes {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "all" {
+            Ok(StatusCodes::All)
+        } else {
+            let codes: Vec<u16> = s
+                .split(',')
+                .map(|code| code.parse::<u16>().map_err(|_| format!("Invalid code: {}", code)))
+                .collect::<Result<Vec<u16>, String>>()?;
+            Ok(StatusCodes::Codes(codes))
+        }
+    }
+}
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
@@ -97,11 +120,9 @@ pub struct Args {
         short = 'C',
         long = "fc",
         help = "Filter HTTP status codes from response - Comma separated list",
-        multiple = true,
-        use_value_delimiter = true,
-        value_delimiter = ','
+        parse(try_from_str),
     )]
-    pub(crate) filtercode: Option<Vec<u16>>,
+    pub(crate) filtercode: Option<StatusCodes>,
 
     #[clap(
         short = 's',
@@ -113,16 +134,14 @@ pub struct Args {
     )]
     pub(crate) matchsize: Option<Vec<usize>>,
 
-    #[clap(
+        #[clap(
         short = 'c',
         long = "mc",
-        help = "Match HTTP status codes from response - Comma separated list",
-        multiple = true,
-        use_value_delimiter = true,
-        value_delimiter = ',',
+        help = "Match HTTP status codes from response - Comma separated list ('all' for all codes 0-999)",
+        parse(try_from_str),
         default_value = "200,204,301,302,307,401,403,405"
     )]
-    pub(crate) matchcode: Vec<u16>,
+    pub(crate) matchcode: StatusCodes,
 
     #[clap(
         short = 'U',
