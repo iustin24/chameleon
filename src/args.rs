@@ -14,9 +14,9 @@ pub enum StatusCodes {
     Codes(Vec<u16>),
 }
 
+
 impl FromStr for StatusCodes {
     type Err = String;
-
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s == "all" {
             Ok(StatusCodes::All)
@@ -26,6 +26,29 @@ impl FromStr for StatusCodes {
                 .map(|code| code.parse::<u16>().map_err(|_| format!("Invalid code: {}", code)))
                 .collect::<Result<Vec<u16>, String>>()?;
             Ok(StatusCodes::Codes(codes))
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum Size {
+    Single(usize),
+    Range(usize, usize),
+}
+
+impl FromStr for Size {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split('-').collect();
+
+        match parts.len() {
+            1 => Ok(Size::Single(parts[0].parse::<usize>().map_err(|e: std::num::ParseIntError| e.to_string())?)),
+            2 => Ok(Size::Range(
+                parts[0].parse::<usize>().map_err(|e: std::num::ParseIntError| e.to_string())?,
+                      parts[1].parse::<usize>().map_err(|e: std::num::ParseIntError| e.to_string())?
+            )),
+            _ => Err("Invalid filter size format".to_string()),
         }
     }
 }
@@ -112,9 +135,10 @@ pub struct Args {
         help = "Filter HTTP response size. Comma separated list of sizes",
         multiple = true,
         use_value_delimiter = true,
-        value_delimiter = ','
+        value_delimiter = ',',
+        parse(try_from_str = Size::from_str)
     )]
-    pub(crate) filtersize: Option<Vec<usize>>,
+    pub(crate) filtersize: Option<Vec<Size>>,
 
     #[clap(
         short = 'C',
@@ -130,9 +154,10 @@ pub struct Args {
         help = "Match HTTP response size. Comma separated list of sizes",
         multiple = true,
         use_value_delimiter = true,
-        value_delimiter = ','
+        value_delimiter = ',',
+        parse(try_from_str = Size::from_str)
     )]
-    pub(crate) matchsize: Option<Vec<usize>>,
+    pub(crate) matchsize: Option<Vec<Size>>,
 
         #[clap(
         short = 'c',

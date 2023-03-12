@@ -27,7 +27,7 @@ impl Metadata for MetadataStruct {
 
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct FilterDecider<'a, F>
+pub struct RDecider<'a, F>
 where
     F: Fn(&'a Args, u16, usize, &SharedState) -> Action,
 {
@@ -35,7 +35,7 @@ where
     args: &'a Args,
 }
 
-impl<'a, F> FilterDecider<'a, F>
+impl<'a, F> RDecider<'a, F>
 where
     F: Fn(&Args, u16, usize, &SharedState) -> Action,
 {
@@ -44,7 +44,7 @@ where
     }
 }
 
-impl<'a, O, R, F> DeciderHooks<O, R> for FilterDecider<'a, F>
+impl<'a, O, R, F> DeciderHooks<O, R> for RDecider<'a, F>
 where
     O: Observers<R>,
     R: Response,
@@ -52,7 +52,7 @@ where
 {
 }
 
-impl<'a, O, R, F> Decider<O, R> for FilterDecider<'a, F>
+impl<'a, O, R, F> Decider<O, R> for RDecider<'a, F>
 where
     O: Observers<R>,
     R: Response,

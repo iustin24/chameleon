@@ -1,8 +1,8 @@
 mod decider;
 
-use crate::utils::decider::{CalibrateDecider, FilterDecider, MetadataStruct};
+use crate::args::{Size, StatusCodes};
+use crate::utils::decider::{CalibrateDecider, MetadataStruct, RDecider};
 use crate::Args;
-use crate::args::StatusCodes;
 use colored::Colorize;
 use feroxfuzz::client::AsyncClient;
 use feroxfuzz::corpora::{HttpMethodsCorpus, Wordlist};
@@ -103,37 +103,37 @@ pub(crate) async fn http(paths: HashSet<String>, args: &Args, url: &String) {
                     Action::Keep
                 });
 
-            let match_decider =
-                FilterDecider::new(args, |args, code, length, _state| {
-                    match &args.matchcode {
-                        StatusCodes::All => {
-                            return Action::Keep;
-                        },
-                        StatusCodes::Codes(codes) => {
-                            match filter(codes, &code, true) {
-                                Action::Keep => match &args.matchsize {
-                                    Some(fs) => filter(fs, &length, true),
-                                    _ => Action::Keep,
-                                },
-                                _ => Action::Discard,
+            let match_decider = RDecider::new(args, |args, code, length, _state| {
+                match (&args.matchcode, &args.matchsize) {
+                    (StatusCodes::All, None) => Action::Keep,
+                    (StatusCodes::Codes(codes), None) => filter(codes, &code, true),
+                    (StatusCodes::All, Some(sizes)) => check_size(length, sizes, false),
+                    (StatusCodes::Codes(codes), Some(sizes)) => {
+                        match filter(codes, &code, true) {
+                            Action::Discard => return Action::Discard,
+                            Action::Keep => {
+                                return check_size(length, sizes, false);
                             }
-                        }
+                            _ => return Action::Keep,
+                        };
                     }
-                });
+                }
+            });
 
-            let filter_decider = FilterDecider::new(args, |args, code, length, _state| {
-                if let Some(filter_codes) = &args.filtercode {
-                    match filter_codes {
-                        StatusCodes::All => return Action::Discard,
-                        StatusCodes::Codes(codes) if filter(codes, &code, false) == Action::Discard => return Action::Discard,
-                        StatusCodes::Codes(_) => {
-                            if let Some(fs) = &args.filtersize {
-                                return filter(fs, &length, false);
-                            }
+            let filter_decider = RDecider::new(args, |args, code, length, _state| {
+                match (&args.filtercode, &args.filtersize) {
+                    (None, None) => Action::Keep,
+                    (Some(StatusCodes::All), _) => Action::Discard,
+                    (Some(StatusCodes::Codes(codes)), None) => filter(&codes, &code, false),
+                    (None, Some(size)) => check_size(length, size, true),
+                    (Some(StatusCodes::Codes(codes)), Some(size)) => {
+                        if filter(&codes, &code, false) == Action::Discard {
+                            Action::Discard
+                        } else {
+                            check_size(length, size, true)
                         }
                     }
                 }
-                return Action::Keep;
             });
 
             let response_printer = ResponseProcessor::new(
@@ -279,6 +279,32 @@ fn filter<T: PartialEq>(vec: &Vec<T>, c: &T, m: bool) -> Action {
     } else {
         Action::Discard
     }
+}
+
+fn check_size(size: usize, filters: &Vec<Size>, should_discard: bool) -> Action {
+    for filter in filters {
+        match filter {
+            Size::Single(val) => {
+                if *val == size {
+                    return if should_discard {
+                        Action::Discard
+                    } else {
+                        Action::Keep
+                    };
+                }
+            }
+            Size::Range(start, end) => {
+                if size >= *start && size <= *end {
+                    return if should_discard {
+                        Action::Discard
+                    } else {
+                        Action::Keep
+                    };
+                }
+            }
+        }
+    }
+    Action::Discard
 }
 
 pub(crate) async fn calibrate_results(args: &Args, url: &String) -> Vec<MetadataStruct> {
