@@ -197,6 +197,14 @@ pub struct Args {
         value_delimiter = ','
     )]
     pub(crate) methods: Vec<String>,
+
+    #[clap(
+        short = 'z',
+        long = "timeout",
+        help = "Request timeout length ( default: 10 )",
+        default_value = "10"
+    )]
+    pub(crate) timeout: u64,
 }
 
 impl Args {
@@ -213,11 +221,11 @@ impl Args {
 
     pub(crate) fn build_client(&self) -> Client {
         let client_builder = http::builder()
-            .connect_timeout(Duration::from_secs(5))
+            .connect_timeout(Duration::from_secs(self.timeout))
             .danger_accept_invalid_certs(true)
             .redirect(reqwest::redirect::Policy::none())
             //.proxy(reqwest::Proxy::https("http://127.0.0.1:8080").unwrap())
-            .timeout(Duration::from_secs(5))
+            .timeout(Duration::from_secs(self.timeout))
             .user_agent(&self.useragent);
         client_builder.build().unwrap()
     }
